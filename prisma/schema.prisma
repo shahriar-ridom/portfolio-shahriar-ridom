@@ -1,6 +1,11 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
-  engineType = "library"
 }
 
 datasource db {
@@ -12,6 +17,7 @@ model Profile {
   fullName    String   @default("Shahriar Ridom")
   title       String   @default("Web Developer")
   bio         String
+  imageUrl    String?
   resumeLink  String?
   socialLinks Json?
   createdAt   DateTime @default(now())
@@ -40,3 +46,24 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+enum SkillCategory {
+  FRONTEND
+  BACKEND
+  DEVOPS
+  TOOL
+}
+
+model Skill {
+  id        String        @id @default(cuid())
+  name      String
+  category  SkillCategory
+  level     Int           @default(0) // 0-100
+  iconName  String        // Store icon name string (e.g., "SiReact")
+  color     String?       // Hex code for hover effects
+  order     Int           @default(0)
+  showInMarquee Boolean   @default(false)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+

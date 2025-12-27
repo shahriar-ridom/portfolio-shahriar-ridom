@@ -1,38 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react"; // New hook in Next.js 15/16 (React 19)
+// If 'react' doesn't have it yet in your version, use: import { useFormState } from "react-dom";
+
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { createProject } from "@/app/actions";
+
+// Initial state for the reducer
+const initialState = {
+  success: false,
+  message: "",
+  errors: {},
+};
 
 export default function NewProjectPage() {
-  const router = useRouter();
-  const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    description: "",
-    thumbnailUrl: "",
-    liveUrl: "",
-    repoUrl: "",
-    tags: "",
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    alert("Project created!");
-    router.push("/admin/projects");
-    setSaving(false);
-  };
+  // 1. Hook the server action
+  // state: contains the return value from createProject (success, message, errors)
+  // formAction: the function to pass to <form action={...}>
+  // isPending: true while submitting (replaces your manual 'saving' state)
+  const [state, formAction, isPending] = useActionState(
+    createProject,
+    initialState
+  );
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -47,83 +41,112 @@ export default function NewProjectPage() {
 
       <Card className="bg-black/50 border-white/10">
         <CardContent className="pt-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 2. Bind the formAction here */}
+          <form action={formAction} className="space-y-6">
+            {/* Global Error Message (e.g., Database connection failed) */}
+            {!state.success && state.message && (
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-sm">
+                {state.message}
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="title">Project Title</Label>
               <Input
                 id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                required
+                name="title"
+                placeholder="e.g. E-Commerce Dashboard"
+                required // Client-side check
               />
+              {/* 3. Display Server-Side Validation Errors */}
+              {state.errors?.title && (
+                <p className="text-red-500 text-xs">{state.errors.title[0]}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="slug">Slug</Label>
               <Input
                 id="slug"
-                value={formData.slug}
-                onChange={(e) =>
-                  setFormData({ ...formData, slug: e.target.value })
-                }
-                required
+                name="slug"
+                placeholder="Leave empty to auto-generate"
               />
+              {state.errors?.slug && (
+                <p className="text-red-500 text-xs">{state.errors.slug[0]}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <textarea
                 id="description"
+                name="description"
                 rows={4}
                 className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
                 required
               />
+              {state.errors?.description && (
+                <p className="text-red-500 text-xs">
+                  {state.errors.description[0]}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
+              <Input
+                id="thumbnailUrl"
+                name="thumbnailUrl"
+                defaultValue="https://placehold.co/600x400"
+              />
+              {state.errors?.thumbnailUrl && (
+                <p className="text-red-500 text-xs">
+                  {state.errors.thumbnailUrl[0]}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="liveUrl">Live URL</Label>
-                <Input
-                  id="liveUrl"
-                  value={formData.liveUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, liveUrl: e.target.value })
-                  }
-                />
+                <Input id="liveUrl" name="liveUrl" placeholder="https://..." />
+                {state.errors?.liveUrl && (
+                  <p className="text-red-500 text-xs">
+                    {state.errors.liveUrl[0]}
+                  </p>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="repoUrl">Repo URL</Label>
                 <Input
                   id="repoUrl"
-                  value={formData.repoUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, repoUrl: e.target.value })
-                  }
+                  name="repoUrl"
+                  placeholder="https://github.com/..."
                 />
+                {state.errors?.repoUrl && (
+                  <p className="text-red-500 text-xs">
+                    {state.errors.repoUrl[0]}
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tags">Tags (comma separated)</Label>
+              <Label htmlFor="tags">Tags</Label>
               <Input
                 id="tags"
+                name="tags"
                 placeholder="React, Next.js, TypeScript"
-                value={formData.tags}
-                onChange={(e) =>
-                  setFormData({ ...formData, tags: e.target.value })
-                }
               />
+              {state.errors?.tags && (
+                <p className="text-red-500 text-xs">{state.errors.tags[0]}</p>
+              )}
             </div>
 
-            <Button type="submit" disabled={saving} className="w-full">
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Project
+            {/* Submit Button with Pending State */}
+            <Button type="submit" disabled={isPending} className="w-full">
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isPending ? "Creating..." : "Create Project"}
             </Button>
           </form>
         </CardContent>

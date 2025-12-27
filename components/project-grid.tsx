@@ -1,97 +1,45 @@
-import { prisma } from "@/lib/prisma";
+import { getProjects } from "@/app/actions";
 import { ProjectCard } from "@/components/project-card";
-import type { Project } from "@prisma/client";
-
-async function getProjects() {
-  try {
-    const projects = await prisma.project.findMany({
-      orderBy: { order: "asc" },
-    });
-    return projects;
-  } catch (error) {
-    console.error("Failed to fetch projects:", error);
-    return [];
-  }
-}
-
-// Temporary mock data for display until DB is connected
-const MOCK_PROJECTS: Project[] = [
-  {
-    id: "1",
-    title: "E-Commerce Analytics Dashboard",
-    slug: "ecommerce-dashboard",
-    description:
-      "A comprehensive SaaS platform for real-time sales tracking, inventory management, and predictive AI insights.",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop",
-    videoUrl: null,
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com",
-    tags: ["React", "Next.js", "Tailwind"],
-    featured: true,
-    order: 1,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "2",
-    title: "NeoBank Mobile App",
-    slug: "neobank-app",
-    description:
-      "Secure, biometric-enabled fintech solution for modern banking needs.",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1470&auto=format&fit=crop",
-    videoUrl: null,
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com",
-    tags: ["React Native", "TypeScript"],
-    featured: true,
-    order: 2,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "3",
-    title: "AI Image Generator",
-    slug: "ai-image-gen",
-    description:
-      "OpenAI API Integration for generating creative assets on the fly.",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1530&auto=format&fit=crop",
-    videoUrl: null,
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com",
-    tags: ["OpenAI", "Node.js"],
-    featured: false,
-    order: 3,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "4",
-    title: "Crypto Portfolio Tracker",
-    slug: "crypto-tracker",
-    description:
-      "Real-time cryptocurrency tracking with advanced charting and portfolio management.",
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1642104704074-907c0698cbd9?q=80&w=2832&auto=format&fit=crop",
-    videoUrl: null,
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com",
-    tags: ["Web3", "Solidity"],
-    featured: false,
-    order: 4,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+import { Loader2 } from "lucide-react";
+import { Suspense } from "react";
+export const dynamic = "force-dyanmic";
 
 export async function ProjectGrid() {
-  const projects = await getProjects();
+  // const projects = [
+  //   {
+  //     slug: "project-alpha",
+  //     id: "proj_01",
+  //     title: "Project Alpha",
+  //     description:
+  //       "A cutting-edge web application built with modern technologies.",
+  //     thumbnailUrl: "/placeholder.svg",
+  //     videoUrl: "",
+  //     liveUrl: "https://example.com",
+  //     repoUrl: "https://github.com",
+  //     tags: ["React", "TypeScript", "Tailwind"],
+  //     featured: true,
+  //     order: 1,
+  //     createdAt: new Date("2023-12-21"),
+  //     updatedAt: new Date("2023-12-21"),
+  //   },
+  //   {
+  //     slug: "project-beta",
+  //     id: "proj_02",
+  //     title: "Project Beta",
+  //     description: "An innovative mobile-first design system.",
+  //     thumbnailUrl: "/placeholder.svg",
+  //     videoUrl: "",
+  //     liveUrl: "https://example.com",
+  //     repoUrl: "https://github.com",
+  //     tags: ["Next.js", "Framer Motion"],
+  //     featured: true,
+  //     order: 2,
+  //     createdAt: new Date("2024-01-15"),
+  //     updatedAt: new Date("2024-01-20"),
+  //   },
+  // ];
 
-  if (projects.length === 0) {
-    return null;
-  }
+  const projects = await getProjects();
 
   return (
     <section
@@ -116,9 +64,11 @@ export async function ProjectGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 auto-rows-[280px]">
-        {projects.map((project, index) => (
-          <ProjectCard key={project.id} project={project} index={index} />
-        ))}
+        <Suspense fallback={<Loader2 className="h-4 w-4 animate-spin" />}>
+          {projects.map((project, index) => (
+            <ProjectCard key={project.id} project={project} index={index} />
+          ))}
+        </Suspense>
       </div>
     </section>
   );

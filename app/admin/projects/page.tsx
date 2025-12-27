@@ -1,99 +1,99 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { getProjects, deleteProject } from "@/app/actions";
-import type { Project } from "@prisma/client";
+import { Plus, Pencil, Calendar } from "lucide-react";
+import { DeleteProjectButton } from "./delete-button";
+import { getProjects } from "@/app/actions";
 
-export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const data = await getProjects();
-      setProjects(data);
-    } catch (error) {
-      console.error("Failed to fetch projects", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
-
-    try {
-      const result = await deleteProject(id);
-      if (result.success) {
-        setProjects(projects.filter((p) => p.id !== id));
-      } else {
-        alert("Failed to delete project");
-      }
-    } catch (error) {
-      console.error("Error deleting project:", error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
+export default async function ProjectsPage() {
+  const projects = await getProjects();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Projects</h2>
-        <Button asChild>
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Projects</h2>
+          <p className="text-muted-foreground mt-1">
+            Manage and organize your portfolio work.
+          </p>
+        </div>
+        <Button asChild className="bg-white text-black hover:bg-gray-200">
           <Link href="/admin/projects/new">
             <Plus className="mr-2 h-4 w-4" /> Add Project
           </Link>
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      {/* Grid */}
+      <div className="grid gap-6">
         {projects.length === 0 ? (
-          <p className="text-muted-foreground">
-            No projects found. Add one to get started.
-          </p>
+          <div className="text-center py-20 border border-dashed border-white/10 rounded-lg">
+            <p className="text-muted-foreground">No projects found.</p>
+            <Button variant="link" asChild className="mt-2 text-white">
+              <Link href="/admin/projects/new">Create your first project</Link>
+            </Button>
+          </div>
         ) : (
           projects.map((project) => (
-            <Card key={project.id} className="bg-black/50 border-white/10">
+            <Card
+              key={project.id}
+              className="bg-zinc-900 border-white/5 overflow-hidden group"
+            >
               <CardContent className="flex items-center justify-between p-6">
-                <div>
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                  <p className="text-muted-foreground line-clamp-1">
-                    {project.description}
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-white/10 px-2 py-1 rounded-full"
-                      >
-                        {tag}
+                {/* Left Side: Info */}
+                <div className="flex gap-6 items-center">
+                  {/* Thumbnail Preview */}
+                  <div className="h-16 w-24 bg-zinc-800 rounded-md overflow-hidden relative shrink-0">
+                    <img
+                      src={project.thumbnailUrl}
+                      alt={project.title}
+                      className="h-full w-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
+                      {project.title}
+                    </h3>
+
+                    <div className="flex items-center gap-3 mt-2 text-sm text-zinc-400">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {project.createdAt.toLocaleDateString()}
                       </span>
-                    ))}
+                      <span className="w-1 h-1 bg-zinc-600 rounded-full" />
+                      <p className="line-clamp-1 max-w-md">
+                        {project.description}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2 mt-3">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] uppercase tracking-wider font-medium bg-white/5 border border-white/10 px-2 py-1 rounded text-zinc-300"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+
+                {/* Right Side: Actions */}
+                <div className="flex items-center gap-3">
                   <Button
-                    variant="destructive"
+                    asChild
+                    variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(project.id)}
+                    className="hover:bg-blue-500/10 hover:text-blue-400"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Link href={`/admin/projects/${project.id}`}>
+                      <Pencil className="h-4 w-4" />
+                    </Link>
                   </Button>
+
+                  <DeleteProjectButton id={project.id} />
                 </div>
               </CardContent>
             </Card>
