@@ -1,0 +1,10 @@
+export default function AdminDashboard() {
+  return (
+    <div>
+      <h2 className="text-3xl font-bold mb-6">Dashboard</h2>
+      <p className="text-muted-foreground">
+        Welcome to the admin panel. Select a section from the sidebar.
+      </p>
+    </div>
+  );
+}
