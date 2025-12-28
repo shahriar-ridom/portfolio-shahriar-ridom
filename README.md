@@ -1,114 +1,133 @@
+# Shahriar Ridom - Full Stack Portfolio
+
 <div align="center">
 
-![Project Banner](https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/banner-portfolio.png)
-
-# Shahriar Ridom - Portfolio
-
-  <p align="center">
-    A high-performance, minimalist portfolio built for speed, accessibility, and dynamic content management.
-  </p>
-
-  <div align="center">
-    <!-- Frameworks -->
-    <img src="https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
-    <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
-    <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-
-    <!-- Styling -->
-    <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-    <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
-
-    <!-- Backend & Tools -->
-    <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" alt="Prisma" />
-    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
-    <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-
-  </div>
-</div>
+![Next.js](https://img.shields.io/badge/Next.js_16-black?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
 
 <br />
 
-## 🚀 Features
+**Next.js 16 (App Router) • TypeScript • Tailwind CSS v4 • Supabase**
 
-- **⚡ High Performance**: Built with Next.js 16 (App Router) for optimal speed and SEO.
-- **🎨 Modern UI/UX**: Styled with Tailwind CSS v4 and animated with Framer Motion.
-- **📱 Fully Responsive**: Mobile-first design ensuring a seamless experience across all devices.
-- **🛠️ Admin Dashboard**: Integrated CMS to manage projects, skills, and profile information dynamically.
-- **🔒 Secure Authentication**: Protected admin routes and secure database interactions.
-- **🗄️ Robust Backend**: Powered by Prisma ORM with Supabase (PostgreSQL) for reliable data persistence.
+</div>
 
-## 🛠️ Installation & Setup
+## 📖 About The Project
 
-Follow these steps to get the project running locally.
+This is not just a static landing page. This is a comprehensive, full-stack application designed to showcase engineering capabilities, focusing on performance, accessibility, and dynamic content management.
+
+While a static site generator would suffice for a basic portfolio, this project was architected to demonstrate:
+
+- **Server-Side Rendering (SSR) and Server Actions** using Next.js 16.
+- **Relational Data Modeling** with PostgreSQL.
+- **Secure Authentication/Authorization flows** for administrative access.
+- **Bleeding-edge CSS implementations** using Tailwind v4.
+
+## 🏗️ Tech Stack & Trade-offs
+
+| Component      | Technology              | Reasoning                                                                                                                                              |
+| -------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Framework**  | Next.js 16 (App Router) | Leverages React Server Components (RSC) to minimize client-side bundle size. Chosen over Pages router for better streaming and data fetching patterns. |
+| **Language**   | TypeScript              | Strict typing ensures maintainability and reduces runtime errors. No `any` types allowed.                                                              |
+| **Styling**    | Tailwind CSS v4         | Utility-first CSS for rapid UI development. v4 used to leverage the new high-performance engine.                                                       |
+| **Animations** | Framer Motion           | Provides declarative animations. Trade-off: slightly larger bundle size, but necessary for the desired fluid UX.                                       |
+| **Database**   | PostgreSQL (Supabase)   | Chosen for relational integrity. Supabase provides a production-ready Postgres instance with built-in Auth integration.                                |
+| **ORM**        | Prisma                  | Type-safe database access. The schema acts as the single source of truth for the data model.                                                           |
+
+## 🚀 Key Features
+
+- ⚡ **Zero-Bundle Data Fetching**: Utilizes React Server Components to fetch data on the server, sending only HTML to the client.
+- 🔒 **Role-Based Access Control**: Admin dashboard is protected via Supabase Auth middleware, ensuring only authorized users can mutate data.
+- 📝 **Integrated CMS**: A custom-built admin panel allows for CRUD operations on Projects, Skills, and Profile data without touching the code.
+- 🎨 **Optimistic UI**: Mutations (like updating a project) reflect immediately on the UI before the server confirms, ensuring a snappy experience.
+- 📱 **Responsive & Accessible**: Heavily tested on various viewports and follows semantic HTML5 guidelines.
+
+## 📸 Interface
+
+### Public View
+
+_(Add screenshot here)_
+
+### Admin Dashboard
+
+_(Add screenshot here)_
+
+## 🛠️ Local Development Setup
 
 ### Prerequisites
 
-- **Node.js** (v20 or higher)
-- **npm** or **pnpm**
-- **PostgreSQL** database (or a Supabase project)
+- **Node.js** (v20 or higher required for Next.js 16)
+- **pnpm** (Recommended) or npm
+- **PostgreSQL database** (Local or Supabase)
 
-### 1. Clone the Repository
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/shahriar-ridom/portfolio-shahriar-ridom.git
 cd portfolio-shahriar-ridom
-```
 
-### 2. Install Dependencies
-
-```bash
-npm install
-# or
+# Install dependencies
 pnpm install
 ```
 
-### 3. Configure Environment Variables
+### 2. Environment Configuration
 
-Create a `.env` file in the root directory. You can use `.env.example` as a reference if available.
+Copy the example environment file:
 
-```env
-# Database Connection
-DATABASE_URL="postgresql://user:password@host:port/database?schema=public"
-DIRECT_URL="postgresql://user:password@host:port/database?schema=public"
-
-
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key"
+```bash
+cp .env.example .env
 ```
 
-### 4. Database Setup
+Fill in your credentials. Note: Since this project uses Supabase with Prisma, you must configure the connection pool correctly.
 
-Run the Prisma migrations to set up your database schema.
+```env
+# Database (Transaction & Session Mode)
+# Use port 6543 (pooler) for the main app
+DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Use port 5432 (direct) for migrations
+DIRECT_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+
+# Auth
+NEXT_PUBLIC_SUPABASE_URL="https://[project-ref].supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="[your-anon-key]"
+```
+
+### 3. Database Migration
+
+Apply the Prisma schema to your database to create the necessary tables:
 
 ```bash
 npx prisma migrate dev --name init
 ```
 
-### 5. Run the Development Server
+### 4. Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-## 📸 Screenshots
+## 🧪 Database Schema
 
-<details>
-<summary>Click to view screenshots</summary>
-<br>
+The data model is defined in `prisma/schema.prisma`. Primary entities include:
 
-|                                               Desktop View                                               |                                            Mobile View                                             |
-| :------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------: |
-| ![Desktop](https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/banner-portfolio.png) | ![Mobile](https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/mobile-view.png) |
+- **Profile**: Singleton model for bio/hero section information.
+- **Project**: Portfolio items with rich text descriptions and image URLs.
+- **Skill**: Categorized technical skills (Frontend, Backend, Tools).
+- **Experience**: Work history timeline.
 
-|                                         Admin Dashboard                                          |                                         Project Details                                         |
-| :----------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------: |
-| ![Admin](https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/admin-view.png) | ![Project](https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/project.png) |
+## 🤝 Contributing
 
-</details>
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Distributed under the MIT License. See `LICENSE` for more information.
