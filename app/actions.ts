@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
-
 // --- Types ---
 export type ActionState = {
   success: boolean;
@@ -32,7 +31,10 @@ export async function getProfile() {
   }
 }
 
-export async function updateProfile(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function updateProfile(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const rawData = {
     fullName: formData.get("fullName"),
     title: formData.get("title"),
@@ -85,7 +87,10 @@ const projectSchema = z.object({
   repoUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
   tags: z.string().transform((str) =>
     str
-      ? str.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
+      ? str
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0)
       : []
   ),
   featured: z.boolean().optional(),
@@ -102,7 +107,10 @@ export async function getProjects() {
   }
 }
 
-export async function createProject(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function createProject(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   // 1. Extract Data safely
   const rawData = {
     title: formData.get("title"),
@@ -208,7 +216,10 @@ export async function getSkills() {
   }
 }
 
-export async function addSkill(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function addSkill(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     category: formData.get("category"),
@@ -268,7 +279,10 @@ const contactSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
-export async function sendMessage(prevState: ActionState, formData: FormData): Promise<ActionState> {
+export async function sendMessage(
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
