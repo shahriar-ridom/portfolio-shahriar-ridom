@@ -9,19 +9,88 @@ import {
   User,
   FolderKanban,
   LogOut,
-  Cpu, // Icon for Skills
+  Cpu,
   Menu,
-  X
+  X,
+  LucideIcon
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 
-const NAV_ITEMS = [
+// --- Configuration ---
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/profile", label: "Profile", icon: User },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
-  { href: "/admin/skills", label: "Skills", icon: Cpu }, // <--- Added Skills
+  { href: "/admin/skills", label: "Skills", icon: Cpu },
 ];
+
+// --- Sub-Components ---
+
+// 1. Define Props Interface for the extracted component
+interface NavContentProps {
+  pathname: string;
+  onClose: () => void;
+  onLogout: () => void;
+}
+
+// 2. Move NavContent OUTSIDE the main component
+const NavContent = ({ pathname, onClose, onLogout }: NavContentProps) => (
+  <div className="flex flex-col h-full">
+    <div className="p-6 border-b border-white/10 flex items-center justify-between">
+      <h1 className="text-xl font-bold tracking-tighter">Admin Panel</h1>
+      {/* Close button for mobile only */}
+      <button
+        className="md:hidden p-1 hover:bg-white/10 rounded-md transition-colors"
+        onClick={onClose}
+        aria-label="Close menu"
+      >
+        <X className="w-6 h-6" />
+      </button>
+    </div>
+
+    <nav className="flex-1 p-4 space-y-2">
+      {NAV_ITEMS.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onClose} // Close menu on click (mobile)
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Icon className="w-5 h-5" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+
+    <div className="p-4 border-t border-white/10">
+      <button
+        onClick={onLogout}
+        className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-red-500/10 text-red-500 transition-colors font-medium"
+      >
+        <LogOut className="w-5 h-5" />
+        Logout
+      </button>
+    </div>
+  </div>
+);
+
+// --- Main Component ---
 
 export function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,60 +98,22 @@ export function AdminSidebar() {
   const router = useRouter();
 
   const handleLogout = async () => {
+    // Ideally, wrap this in a try/catch, but for now we keep existing logic
     await supabase.auth.signOut();
     router.push("/login");
   };
-
-  const NavContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-white/10 flex items-center justify-between">
-        <h1 className="text-xl font-bold tracking-tighter">Admin Panel</h1>
-        {/* Close button for mobile only */}
-        <button className="md:hidden" onClick={() => setIsOpen(false)}>
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-
-      <nav className="flex-1 p-4 space-y-2">
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setIsOpen(false)} // Close menu on click (mobile)
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                  : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 border-t border-white/10">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-red-500/10 text-red-500 transition-colors font-medium"
-        >
-          <LogOut className="w-5 h-5" />
-          Logout
-        </button>
-      </div>
-    </div>
-  );
 
   return (
     <>
       {/* Mobile Toggle Button */}
       <div className="md:hidden fixed top-4 left-4 z-50">
-        <Button variant="outline" size="icon" onClick={() => setIsOpen(true)} className="bg-background">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setIsOpen(true)}
+          className="bg-background"
+          aria-label="Open menu"
+        >
           <Menu className="w-5 h-5" />
         </Button>
       </div>
@@ -92,6 +123,7 @@ export function AdminSidebar() {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
+          aria-hidden="true"
         />
       )}
 
@@ -102,7 +134,15 @@ export function AdminSidebar() {
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <NavContent />
+        {/* 3. Pass the dependencies down as props.
+           Now React knows NavContent is the same component,
+           and only updates the parts of the DOM that actually changed.
+        */}
+        <NavContent
+          pathname={pathname}
+          onClose={() => setIsOpen(false)}
+          onLogout={handleLogout}
+        />
       </aside>
     </>
   );

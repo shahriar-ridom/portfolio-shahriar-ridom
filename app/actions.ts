@@ -9,7 +9,7 @@ import { Prisma } from "@prisma/client";
 // --- Types ---
 export type ActionState = {
   success: boolean;
-  message?: string;
+  message: string;
   errors?: Record<string, string[]>; // Field-specific errors
 };
 
@@ -20,43 +20,24 @@ const profileSchema = z.object({
   title: z.string().min(1, "Title is required"),
   bio: z.string().min(1, "Bio is required"),
   imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  resumeLink: z.string().optional().or(z.literal("")), // Allow empty string as valid optional
-});
-
-// --- Skill Actions ---
-
-const skillSchema = z.object({
-  name: z.string().min(1),
-  category: z.enum(["FRONTEND", "BACKEND", "DEVOPS"]),
-  level: z.coerce.number().min(0).max(100),
-  iconName: z.string().min(1),
-  showInMarquee: z.boolean().optional(),
-});
-
-// --- Contact Actions ---
-
-const contactSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  message: z.string().min(10),
+  resumeLink: z.string().optional().or(z.literal("")),
 });
 
 export async function getProfile() {
   try {
     return await prisma.profile.findFirst();
   } catch (error) {
-    // In Server Components, we generally just want null if DB fails so UI can handle empty state
     console.error("Failed to fetch profile:", error);
     return null;
   }
 }
 
-export async function updateProfile(prevState: any, formData: FormData) {
+export async function updateProfile(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const rawData = {
     fullName: formData.get("fullName"),
     title: formData.get("title"),
     bio: formData.get("bio"),
-    imageUrl: formData.get("imageUrl"), // Capture from form
+    imageUrl: formData.get("imageUrl"),
     resumeLink: formData.get("resumeLink"),
   };
 
@@ -97,19 +78,14 @@ export async function updateProfile(prevState: any, formData: FormData) {
 
 const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  // Slug is optional in schema because we auto-generate it if missing
   slug: z.string().optional().or(z.literal("")),
   description: z.string().min(10, "Description must be at least 10 chars"),
   thumbnailUrl: z.string().url("Invalid URL"),
   liveUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
   repoUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  // Transform comma-separated string to array INSIDE Zod
   tags: z.string().transform((str) =>
     str
-      ? str
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0)
+      ? str.split(",").map((s) => s.trim()).filter((s) => s.length > 0)
       : []
   ),
   featured: z.boolean().optional(),
@@ -126,16 +102,17 @@ export async function getProjects() {
   }
 }
 
-export async function createProject(prevState: any, formData: FormData) {
-  // 1. Extract Data safely (handling nulls from formData)
+export async function createProject(prevState: ActionState, formData: FormData): Promise<ActionState> {
+  // 1. Extract Data safely
   const rawData = {
-    title: formData.get("title") as string,
-    slug: formData.get("slug") as string,
-    description: formData.get("description") as string,
-    thumbnailUrl: formData.get("thumbnailUrl") as string,
-    liveUrl: formData.get("liveUrl") as string,
-    repoUrl: formData.get("repoUrl") as string,
-    tags: formData.get("tags") as string,
+    title: formData.get("title"),
+    slug: formData.get("slug"),
+    description: formData.get("description"),
+    thumbnailUrl: formData.get("thumbnailUrl"),
+    liveUrl: formData.get("liveUrl"),
+    repoUrl: formData.get("repoUrl"),
+    tags: formData.get("tags"),
+    // Checkbox logic: if present, it's "on". If missing, it's null.
     featured: formData.get("featured") === "on",
   };
 
@@ -163,13 +140,13 @@ export async function createProject(prevState: any, formData: FormData) {
     await prisma.project.create({
       data: {
         title: validated.data.title,
-        slug: finalSlug, // Use the calculated slug
+        slug: finalSlug,
         description: validated.data.description,
         thumbnailUrl: validated.data.thumbnailUrl,
-        liveUrl: validated.data.liveUrl || null, // Convert empty strings to DB Nulls
+        liveUrl: validated.data.liveUrl || null,
         repoUrl: validated.data.repoUrl || null,
-        tags: validated.data.tags, // Already an array thanks to Zod transform
-        featured: validated.data.featured,
+        tags: validated.data.tags,
+        featured: validated.data.featured || false,
       },
     });
   } catch (error) {
@@ -187,20 +164,18 @@ export async function createProject(prevState: any, formData: FormData) {
     return { success: false, message: "Database failed to create project." };
   }
 
-  // 5. Revalidate & Redirect (OUTSIDE try/catch)
+  // 5. Revalidate & Redirect
   revalidatePath("/");
   revalidatePath("/admin/projects");
   redirect("/admin/projects");
 }
 
-export async function deleteProject(id: string) {
+export async function deleteProject(id: string): Promise<ActionState> {
   try {
     await prisma.project.delete({
       where: { id },
     });
 
-    // Note: No redirect needed if called from a list page,
-    // but revalidation is crucial.
     revalidatePath("/");
     revalidatePath("/admin/projects");
     return { success: true, message: "Project deleted" };
@@ -211,6 +186,16 @@ export async function deleteProject(id: string) {
 }
 
 // --- Skills Section ---
+
+const skillSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  category: z.enum(["FRONTEND", "BACKEND", "DEVOPS"]),
+  // Ensure we can coerce the string input from the form into a number
+  level: z.coerce.number().min(0).max(100),
+  iconName: z.string().min(1, "Icon is required"),
+  showInMarquee: z.boolean().optional(),
+});
+
 export async function getSkills() {
   try {
     const skills = await prisma.skill.findMany({
@@ -223,11 +208,11 @@ export async function getSkills() {
   }
 }
 
-export async function addSkill(prevState: any, formData: FormData) {
+export async function addSkill(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     category: formData.get("category"),
-    level: formData.get("level"),
+    level: formData.get("level"), // Zod coerce will handle string -> number
     iconName: formData.get("iconName"),
     showInMarquee: formData.get("showInMarquee") === "on",
   };
@@ -250,8 +235,8 @@ export async function addSkill(prevState: any, formData: FormData) {
         level: validated.data.level,
         iconName: validated.data.iconName,
         showInMarquee: validated.data.showInMarquee || false,
-        order: 0, // Default order
-        color: "#ffffff", // Default color
+        order: 0,
+        color: "#ffffff",
       },
     });
 
@@ -264,20 +249,26 @@ export async function addSkill(prevState: any, formData: FormData) {
   }
 }
 
-export async function deleteSkill(id: string) {
+export async function deleteSkill(id: string): Promise<ActionState> {
   try {
     await prisma.skill.delete({ where: { id } });
     revalidatePath("/");
     revalidatePath("/admin/skills");
-    return { success: true };
+    return { success: true, message: "Skill deleted" };
   } catch (error) {
-    return { success: false, error: "Failed to delete" };
+    return { success: false, message: "Failed to delete" };
   }
 }
 
-// --- Send Message Function
+// --- Contact Actions ---
 
-export async function sendMessage(prevState: any, formData: FormData) {
+const contactSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+export async function sendMessage(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
@@ -297,15 +288,6 @@ export async function sendMessage(prevState: any, formData: FormData) {
   // Simulate Email Sending Delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  // TODO: Integrate Resend or SendGrid here
-  // await resend.emails.send({
-  //   from: 'Portfolio <onboarding@resend.dev>',
-  //   to: 'shahriarridom.info@gmail.com',
-  //   subject: `New Message from ${validated.data.name}`,
-  //   text: validated.data.message
-  // });
-
   console.log("Message received:", validated.data);
-
   return { success: true, message: "Message sent successfully!" };
 }

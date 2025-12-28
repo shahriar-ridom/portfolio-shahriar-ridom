@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Github, Linkedin, Twitter, ArrowUp } from "lucide-react";
+import {
+  ArrowUpRight,
+  Github,
+  Linkedin,
+  Twitter,
+  ArrowUp,
+  LucideIcon,
+} from "lucide-react";
 import { ContactForm } from "./contact-form";
 
 const EMAIL = "shahriarridom.info@gmail.com";
@@ -18,7 +25,6 @@ export function Contact() {
     >
       <div className="w-full max-w-[1200px] mx-auto px-6 md:px-10 z-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start mb-20">
-          {/* Left Column: Heading & Info */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -38,13 +44,12 @@ export function Contact() {
                 <span className="text-muted-foreground/40">in mind?</span>
               </h2>
               <p className="text-base md:text-lg text-muted-foreground/60 max-w-md leading-relaxed">
-                I'm always interested in hearing about new projects and
-                opportunities. Drop me a line and let's create something
+                I&apos;m always interested in hearing about new projects and
+                opportunities. Drop me a line and let&apos;s create something
                 specific.
               </p>
             </div>
 
-            {/* Contact Details (Desktop) */}
             <div className="hidden lg:flex flex-col gap-8 mt-auto">
               <div>
                 <p className="text-sm text-muted-foreground/40 mb-2 uppercase tracking-wider">
@@ -67,11 +72,9 @@ export function Contact() {
             </div>
           </motion.div>
 
-          {/* Right Column: Form */}
           <ContactForm />
         </div>
 
-        {/* Footer Meta */}
         <div className="w-full border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground/30 font-mono">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
             <span>© {new Date().getFullYear()} Shahriar Ridom</span>
@@ -91,7 +94,7 @@ export function Contact() {
   );
 }
 
-function SocialLink({ href, icon: Icon }: { href: string; icon: any }) {
+function SocialLink({ href, icon: Icon }: { href: string; icon: LucideIcon }) {
   return (
     <a
       href={href}

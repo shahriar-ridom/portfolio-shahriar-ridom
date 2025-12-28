@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Pencil, Calendar } from "lucide-react";
 import { DeleteProjectButton } from "./delete-button";
 import { getProjects } from "@/app/actions";
+import Image from "next/image";
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
@@ -44,7 +45,7 @@ export default async function ProjectsPage() {
                 <div className="flex gap-6 items-center">
                   {/* Thumbnail Preview */}
                   <div className="h-16 w-24 bg-zinc-800 rounded-md overflow-hidden relative shrink-0">
-                    <img
+                    <Image
                       src={project.thumbnailUrl}
                       alt={project.title}
                       className="h-full w-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
