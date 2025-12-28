@@ -1,10 +1,11 @@
 // lib/icons.tsx
 import {
   Code, Palette, FileJson, MonitorPlay,
-  Server, Database, Layers, Box, Cloud, GitBranch
+  Server, Database, Layers, Box, Cloud, GitBranch,
+  LucideIcon
 } from "lucide-react";
 
-export const IconMap: Record<string, any> = {
+export const IconMap: Record<string, LucideIcon> = {
   Code, Palette, FileJson, MonitorPlay,
   Server, Database, Layers, Box, Cloud, GitBranch,
   // Add defaults

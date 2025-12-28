@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { addSkill } from "@/app/actions";
+import { addSkill, ActionState } from "@/app/actions"; // Import ActionState type
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,24 +31,38 @@ const AVAILABLE_ICONS = [
 
 const CATEGORIES = ["FRONTEND", "BACKEND", "DEVOPS"];
 
-const initialState = { success: false, message: "", errors: {} };
+// Initialize with the correct shape matching ActionState
+const initialState: ActionState = {
+  success: false,
+  message: "",
+  errors: {}
+};
 
 export function SkillForm() {
   const [state, formAction, isPending] = useActionState(addSkill, initialState);
+
   const [category, setCategory] = useState("");
   const [icon, setIcon] = useState("");
   const [name, setName] = useState("");
+  const [level, setLevel] = useState("80");
 
   useEffect(() => {
-    if (state.success) {
-      setName("");
+    if (state.message) {
       if (state.success) {
         toast.success(state.message);
-      } else if (!state.success && state.message) {
+        const timer = setTimeout(() => {
+          setName("");
+          setCategory("");
+          setIcon("");
+          setLevel("80");
+        }, 0);
+
+        return () => clearTimeout(timer);
+      } else {
         toast.error(state.message);
       }
     }
-  }, [state.success, state.message]);
+  }, [state]);
 
   return (
     <Card className="bg-zinc-900 border-white/10 h-fit">
@@ -57,16 +71,9 @@ export function SkillForm() {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
-          {state.message && (
-            <p
-              className={
-                state.success
-                  ? "text-green-500 text-sm"
-                  : "text-red-500 text-sm"
-              }
-            >
-              {state.message}
-            </p>
+
+          {!state.success && state.message && (
+             <p className="text-red-500 text-sm">{state.message}</p>
           )}
 
           <div className="space-y-2">
@@ -86,11 +93,11 @@ export function SkillForm() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category</Label>
-              {/* 3. BIND VALUE: The component is now locked to your state */}
               <Select
                 name="category"
                 value={category}
                 onValueChange={setCategory}
+                required
               >
                 <SelectTrigger className="bg-transparent border-input">
                   <SelectValue placeholder="Select category" />
@@ -112,7 +119,8 @@ export function SkillForm() {
                 type="number"
                 min="0"
                 max="100"
-                defaultValue="80"
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
                 required
               />
             </div>
@@ -120,7 +128,6 @@ export function SkillForm() {
 
           <div className="space-y-2">
             <Label>Icon</Label>
-            {/* Bind Icon state too for consistency */}
             <Select name="iconName" value={icon} onValueChange={setIcon}>
               <SelectTrigger className="bg-transparent border-input">
                 <SelectValue placeholder="Select icon" />
