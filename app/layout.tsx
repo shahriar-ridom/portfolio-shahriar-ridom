@@ -25,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="apple-mobile-web-app-title" content="Shahriar Ridom" />
+      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
+import logo from "@/app/favicon.ico";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,9 +21,11 @@ export function Navbar() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between w-full max-w-[1200px] mx-auto p-6 md:p-10 pointer-events-none"
       >
         <div className="pointer-events-auto flex items-center gap-2 select-none group cursor-pointer">
-          <div className="flex items-center justify-center size-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm group-hover:border-primary/50 transition-colors">
-            <span className="font-bold text-white tracking-tighter">SR</span>
-          </div>
+          <Link href={"#"}>
+            <div className="flex items-center justify-center size-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm group-hover:border-primary/50 transition-colors">
+              <Image src={logo} width={25} height={25} alt="Shahriar Ridom" />
+            </div>
+          </Link>
         </div>
 
         <div className="pointer-events-auto hidden md:flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1.5 backdrop-blur-md shadow-lg shadow-black/5">
