@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { createElement, useMemo } from "react";
 import { getIcon } from "@/lib/icons";
 import type { Skill } from "@prisma/client";
 
@@ -40,19 +40,19 @@ export function TechMarquee({ skills }: { skills: Skill[] }) {
 }
 
 function TechItem({ tech }: { tech: Skill }) {
-  const Icon = useMemo(() => getIcon(tech.iconName), [tech.iconName]);
-  if (!Icon) {
-    console.warn(`Icon not found for tech: ${tech.name}`);
+  const iconComponent = useMemo(() => getIcon(tech.iconName), [tech.iconName]);
+  if (!iconComponent) {
     return null;
   }
 
   return (
     <li className="group relative flex flex-col items-center gap-2 cursor-pointer transition-all duration-300 hover:scale-110">
       <div className="relative z-10 p-2 rounded-xl bg-transparent transition-colors">
-        <Icon
-          className="w-10 h-10 transition-all duration-300 grayscale group-hover:grayscale-0 filter"
-          style={{ color: tech.color || "#ffffff" }}
-        />
+        {createElement(iconComponent, {
+          className:
+            "w-10 h-10 transition-all duration-300 grayscale group-hover:grayscale-0 filter",
+          style: { color: tech.color || "#ffffff" },
+        })}
       </div>
 
       <span className="text-xs font-medium text-muted-foreground group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-black/50 backdrop-blur-md px-2 py-1 rounded-md border border-white/10">
