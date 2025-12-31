@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import JsonLd from "@/components/JsonLd";
+import MotionProvider from "@/components/MotionProvider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -15,7 +17,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Shahriar Ridom - Portfolio",
-  description: "Senior Fullstack Engineer & Creative Technologist",
+  description: "Fullstack Developer & Creative Technologist",
+  appleWebApp: {
+    title: "Shahriar Ridom",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
@@ -25,13 +31,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <meta name="apple-mobile-web-app-title" content="Shahriar Ridom" />
-      </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >
-        {children}
+        <JsonLd />
+        <MotionProvider>{children}</MotionProvider>
         <Toaster />
       </body>
     </html>

@@ -4,7 +4,6 @@ import { SkillsTabs } from "./skill-tabs";
 import { TechMarquee } from "./tech-marquee";
 
 export async function AboutSection() {
-  // Parallel Data Fetching
   const [profile, skills] = await Promise.all([getProfile(), getSkills()]);
 
   return (
@@ -13,7 +12,6 @@ export async function AboutSection() {
       className="py-24 px-6 md:px-10 w-full max-w-[1200px] mx-auto overflow-hidden"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-        {/* Left Column: Biography */}
         <div className="lg:col-span-5 flex flex-col justify-center">
           <div className="mb-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-mono font-medium tracking-wide text-primary shadow-glow">
@@ -28,7 +26,6 @@ export async function AboutSection() {
           </h2>
 
           <div className="space-y-6 text-muted-foreground text-lg leading-relaxed font-light">
-            {/* Fallback text if profile bio is empty */}
             <p className="whitespace-pre-line">
               I am a full-stack developer passionate about creating seamless
               digital experiences. With a background in design and engineering,
@@ -65,16 +62,11 @@ export async function AboutSection() {
             )}
           </div>
         </div>
-
-        {/* Right Column: Skills Visualization */}
         <div className="lg:col-span-7 flex flex-col justify-center relative">
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
-          {/* We pass the skills fetched on server to the client component */}
           <SkillsTabs skills={skills} />
         </div>
       </div>
-
-      {/* Marquee Section */}
       <TechMarquee skills={skills} />
     </section>
   );

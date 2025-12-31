@@ -107,6 +107,16 @@ export async function getProjects() {
   }
 }
 
+export async function getProjectBySlug(slug: string) {
+  try {
+    return await prisma.project.findUnique({
+      where: { slug },
+    });
+  } catch (error) {
+    console.error("Failed to fetch projects:", error);
+  }
+}
+
 export async function createProject(
   prevState: ActionState,
   formData: FormData
