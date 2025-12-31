@@ -1,10 +1,14 @@
 "use client";
 
+import { useMemo } from "react";
 import { getIcon } from "@/lib/icons";
 import type { Skill } from "@prisma/client";
 
 export function TechMarquee({ skills }: { skills: Skill[] }) {
-  const marqueeSkills = skills.filter((s) => s.showInMarquee);
+  const marqueeSkills = useMemo(
+    () => skills.filter((s) => s.showInMarquee),
+    [skills]
+  );
 
   if (!marqueeSkills.length) return null;
 
@@ -36,7 +40,11 @@ export function TechMarquee({ skills }: { skills: Skill[] }) {
 }
 
 function TechItem({ tech }: { tech: Skill }) {
-  const Icon = getIcon(tech.iconName);
+  const Icon = useMemo(() => getIcon(tech.iconName), [tech.iconName]);
+  if (!Icon) {
+    console.warn(`Icon not found for tech: ${tech.name}`);
+    return null;
+  }
 
   return (
     <li className="group relative flex flex-col items-center gap-2 cursor-pointer transition-all duration-300 hover:scale-110">
