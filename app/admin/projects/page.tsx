@@ -48,6 +48,8 @@ export default async function ProjectsPage() {
                     <Image
                       src={project.thumbnailUrl}
                       alt={project.title}
+                      width={100}
+                      height={100}
                       className="h-full w-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
                     />
                   </div>
