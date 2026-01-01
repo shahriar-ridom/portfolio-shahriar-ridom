@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import JsonLd from "@/components/JsonLd";
 import MotionProvider from "@/components/MotionProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
       >
         <JsonLd />
         <MotionProvider>{children}</MotionProvider>
+        <SpeedInsights />
         <Toaster />
       </body>
     </html>
