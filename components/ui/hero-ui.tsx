@@ -32,10 +32,11 @@ const itemVariants: Variants = {
 
 export function HeroUi({ profile }: HeroUiProps) {
   const fullName = profile?.fullName || "Shahriar Ridom";
-  const title = profile?.title || "Senior Web Developer";
+  const title = profile?.title || "Full-stack Developer";
   const bio =
     profile?.bio ||
-    "Crafting immersive digital experiences. I build robust, scalable applications that merge aesthetic precision with powerful functionality.";
+    "I build accessible, pixel-perfect, and performant web applications." +
+      "Currently focused on mastering the DevOps and System Design.";
 
   const imageUrl =
     profile?.imageUrl ||
@@ -43,7 +44,6 @@ export function HeroUi({ profile }: HeroUiProps) {
 
   return (
     <section className="relative flex flex-col md:flex-row items-center justify-center min-h-[calc(100vh-80px)] w-full max-w-[1200px] mx-auto gap-8 lg:gap-16 px-6 md:px-10 pt-24 md:pt-0">
-      {/* Image Section */}
       <m.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
@@ -68,15 +68,12 @@ export function HeroUi({ profile }: HeroUiProps) {
           </span>
         </div>
       </m.div>
-
-      {/* Text Section */}
       <m.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="w-full md:w-1/2 flex flex-col items-start justify-center text-left space-y-6 md:pl-4"
       >
-        {/* Year Badge */}
         <m.div
           variants={itemVariants}
           className="flex items-center gap-2 text-primary font-mono text-sm tracking-widest uppercase mb-2"
@@ -85,7 +82,6 @@ export function HeroUi({ profile }: HeroUiProps) {
           <span>Portfolio {new Date().getFullYear()}</span>
         </m.div>
 
-        {/* Name Title */}
         <m.h1
           variants={itemVariants}
           className="font-display font-extrabold text-foreground leading-[0.9] tracking-tighter text-[clamp(3rem,6vw,6rem)]"
@@ -97,7 +93,6 @@ export function HeroUi({ profile }: HeroUiProps) {
           ))}
         </m.h1>
 
-        {/* Dynamic Title */}
         <m.div
           variants={itemVariants}
           className="h-8 md:h-10 flex items-center"
@@ -107,7 +102,6 @@ export function HeroUi({ profile }: HeroUiProps) {
           </div>
         </m.div>
 
-        {/* Bio */}
         <m.p
           variants={itemVariants}
           className="max-w-md text-base text-white/50 font-light tracking-wide leading-relaxed"
@@ -115,7 +109,6 @@ export function HeroUi({ profile }: HeroUiProps) {
           {bio}
         </m.p>
 
-        {/* CTA Buttons */}
         <m.div variants={itemVariants} className="flex flex-row gap-3 pt-4">
           <a
             href="#projects"

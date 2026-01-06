@@ -1,10 +1,15 @@
-import { getProfile, getSkills } from "@/app/actions";
-import { Download } from "lucide-react";
+import { getProfile, getProjects, getSkills } from "@/app/actions";
+import { Download, Globe, Code2, Terminal } from "lucide-react";
 import { SkillsTabs } from "./skill-tabs";
 import { TechMarquee } from "./tech-marquee";
-
 export async function AboutSection() {
-  const [profile, skills] = await Promise.all([getProfile(), getSkills()]);
+  const [profile, skills, projects] = await Promise.all([
+    getProfile().catch(() => null),
+    getSkills().catch(() => []),
+    getProjects().catch(() => []),
+  ]);
+
+  const projectCount: string = projects?.length.toString() || "0";
 
   return (
     <section
@@ -14,32 +19,49 @@ export async function AboutSection() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
         <div className="lg:col-span-5 flex flex-col justify-center">
           <div className="mb-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-mono font-medium tracking-wide text-primary shadow-glow">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
-              ABOUT & SKILLS
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs font-mono font-medium tracking-wide text-emerald-500 shadow-glow">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              OPEN TO WORK
             </span>
           </div>
 
           <h2 className="text-foreground tracking-tight text-[32px] md:text-5xl font-bold leading-[1.1] mb-8">
-            Building digital products with{" "}
-            <span className="text-primary">purpose</span>.
+            Engineering simple solutions for{" "}
+            <span className="text-primary">complex problems</span>.
           </h2>
 
           <div className="space-y-6 text-muted-foreground text-lg leading-relaxed font-light">
-            <p className="whitespace-pre-line">
-              I am a full-stack developer passionate about creating seamless
-              digital experiences. With a background in design and engineering,
-              I bridge the gap between aesthetics and functionality.
+            <p>
+              I am a developer who believes in clean code and user-centric
+              design. Currently transitioning from "learning" to "building," I
+              focus on understanding the fundamentals of the web rather than
+              just chasing frameworks.
+            </p>
+            <p>
+              My goal is simple: to build applications that are fast,
+              accessible, and maintainable.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-4 border-y border-white/5 py-8 my-8">
-            <StatItem number="5+" label="Years Exp." />
-            <StatItem number="40+" label="Projects" />
-            <StatItem number="∞" label="Coffees" />
+            <StatItem
+              icon={<Code2 className="w-4 h-4 mb-2 text-primary" />}
+              value={projectCount}
+              label="Core Projects"
+            />
+            <StatItem
+              icon={<Terminal className="w-4 h-4 mb-2 text-blue-400" />}
+              value="100%"
+              label="Commitment"
+            />
+            <StatItem
+              icon={<Globe className="w-4 h-4 mb-2 text-green-400" />}
+              value="Remote"
+              label="Available"
+            />
           </div>
 
-          <div className="flex justify-start">
+          <div className="flex justify-start gap-4">
             {profile?.resumeLink ? (
               <a
                 href={profile.resumeLink}
@@ -49,36 +71,51 @@ export async function AboutSection() {
               >
                 <Download className="mr-2 w-5 h-5" />
                 <span className="text-sm font-bold tracking-wide">
-                  Download Resume
+                  Download CV
                 </span>
               </a>
             ) : (
-              <button
-                disabled
-                className="bg-white/5 text-white/50 h-12 px-8 rounded-full cursor-not-allowed"
+              <a
+                href="https://github.com/shahriar-ridom"
+                target="_blank"
+                className="group flex items-center justify-center rounded-full bg-white/10 h-12 px-8 text-white hover:bg-white/20 transition-all"
               >
-                Resume Unavailable
-              </button>
+                <span className="text-sm font-medium">View GitHub</span>
+              </a>
             )}
           </div>
         </div>
+
         <div className="lg:col-span-7 flex flex-col justify-center relative">
-          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+
           <SkillsTabs skills={skills} />
         </div>
       </div>
-      <TechMarquee skills={skills} />
+
+      <div className="mt-20 opacity-60 hover:opacity-100 transition-opacity duration-500">
+        <TechMarquee skills={skills} />
+      </div>
     </section>
   );
 }
 
-function StatItem({ number, label }: { number: string; label: string }) {
+function StatItem({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+}) {
   return (
-    <div>
-      <div className="text-3xl font-bold text-white mb-1 font-mono">
-        {number}
+    <div className="flex flex-col justify-center">
+      {icon}
+      <div className="text-2xl font-bold text-white mb-1 font-mono tracking-tighter">
+        {value}
       </div>
-      <div className="text-xs text-muted-foreground uppercase tracking-wider">
+      <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
         {label}
       </div>
     </div>
