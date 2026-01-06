@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import JsonLd from "@/components/JsonLd";
+import MotionProvider from "@/components/MotionProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -15,7 +18,11 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "Shahriar Ridom - Portfolio",
-  description: "Senior Fullstack Engineer & Creative Technologist",
+  description: "Fullstack Developer & Creative Technologist",
+  appleWebApp: {
+    title: "Shahriar Ridom",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +35,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-foreground`}
       >
-        {children}
+        <JsonLd />
+        <MotionProvider>{children}</MotionProvider>
+        <SpeedInsights />
         <Toaster />
       </body>
     </html>

@@ -5,42 +5,7 @@ import { Suspense } from "react";
 export const dynamic = "force-dyanmic";
 
 export async function ProjectGrid() {
-  // const projects = [
-  //   {
-  //     slug: "project-alpha",
-  //     id: "proj_01",
-  //     title: "Project Alpha",
-  //     description:
-  //       "A cutting-edge web application built with modern technologies.",
-  //     thumbnailUrl: "/placeholder.svg",
-  //     videoUrl: "",
-  //     liveUrl: "https://example.com",
-  //     repoUrl: "https://github.com",
-  //     tags: ["React", "TypeScript", "Tailwind"],
-  //     featured: true,
-  //     order: 1,
-  //     createdAt: new Date("2023-12-21"),
-  //     updatedAt: new Date("2023-12-21"),
-  //   },
-  //   {
-  //     slug: "project-beta",
-  //     id: "proj_02",
-  //     title: "Project Beta",
-  //     description: "An innovative mobile-first design system.",
-  //     thumbnailUrl: "/placeholder.svg",
-  //     videoUrl: "",
-  //     liveUrl: "https://example.com",
-  //     repoUrl: "https://github.com",
-  //     tags: ["Next.js", "Framer Motion"],
-  //     featured: true,
-  //     order: 2,
-  //     createdAt: new Date("2024-01-15"),
-  //     updatedAt: new Date("2024-01-20"),
-  //   },
-  // ];
-
   const projects = await getProjects();
-
   return (
     <section
       id="projects"

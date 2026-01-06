@@ -1,15 +1,18 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { Resend } from "resend";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import ContactFormEmail from "@/components/template/Email";
+
 // --- Types ---
 export type ActionState = {
   success: boolean;
   message: string;
-  errors?: Record<string, string[]>; // Field-specific errors
+  errors?: Record<string, string[]>;
 };
 
 // --- Profile Actions ---
@@ -107,11 +110,20 @@ export async function getProjects() {
   }
 }
 
+export async function getProjectBySlug(slug: string) {
+  try {
+    return await prisma.project.findUnique({
+      where: { slug },
+    });
+  } catch (error) {
+    console.error("Failed to fetch projects:", error);
+  }
+}
+
 export async function createProject(
   prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  // 1. Extract Data safely
   const rawData = {
     title: formData.get("title"),
     slug: formData.get("slug"),
@@ -120,11 +132,9 @@ export async function createProject(
     liveUrl: formData.get("liveUrl"),
     repoUrl: formData.get("repoUrl"),
     tags: formData.get("tags"),
-    // Checkbox logic: if present, it's "on". If missing, it's null.
     featured: formData.get("featured") === "on",
   };
 
-  // 2. Validate
   const validated = projectSchema.safeParse(rawData);
 
   if (!validated.success) {
@@ -135,7 +145,6 @@ export async function createProject(
     };
   }
 
-  // 3. Logic: Auto-generate slug if empty
   let finalSlug = validated.data.slug;
   if (!finalSlug || finalSlug.trim() === "") {
     finalSlug = validated.data.title
@@ -158,7 +167,6 @@ export async function createProject(
       },
     });
   } catch (error) {
-    // 4. Handle Unique Constraint (P2002)
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return {
@@ -172,7 +180,6 @@ export async function createProject(
     return { success: false, message: "Database failed to create project." };
   }
 
-  // 5. Revalidate & Redirect
   revalidatePath("/");
   revalidatePath("/admin/projects");
   redirect("/admin/projects");
@@ -198,7 +205,6 @@ export async function deleteProject(id: string): Promise<ActionState> {
 const skillSchema = z.object({
   name: z.string().min(1, "Name is required"),
   category: z.enum(["FRONTEND", "BACKEND", "DEVOPS"]),
-  // Ensure we can coerce the string input from the form into a number
   level: z.coerce.number().min(0).max(100),
   iconName: z.string().min(1, "Icon is required"),
   showInMarquee: z.boolean().optional(),
@@ -223,7 +229,7 @@ export async function addSkill(
   const rawData = {
     name: formData.get("name"),
     category: formData.get("category"),
-    level: formData.get("level"), // Zod coerce will handle string -> number
+    level: formData.get("level"),
     iconName: formData.get("iconName"),
     showInMarquee: formData.get("showInMarquee") === "on",
   };
@@ -279,6 +285,8 @@ const contactSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
+const resend = new Resend(process.env.RESEND_API);
+
 export async function sendMessage(
   prevState: ActionState,
   formData: FormData
@@ -288,9 +296,7 @@ export async function sendMessage(
     email: formData.get("email"),
     message: formData.get("message"),
   };
-
   const validated = contactSchema.safeParse(rawData);
-
   if (!validated.success) {
     return {
       success: false,
@@ -299,9 +305,55 @@ export async function sendMessage(
     };
   }
 
-  // Simulate Email Sending Delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  let messageId: string | number;
 
-  console.log("Message received:", validated.data);
-  return { success: true, message: "Message sent successfully!" };
+  try {
+    // First saves message to Database as PENDING
+    const newMessage = await prisma.messages.create({
+      data: {
+        name: validated.data.name,
+        email: validated.data.email,
+        message: validated.data.message,
+        status: "PENDING",
+      },
+    });
+    messageId = newMessage.id;
+  } catch (error) {
+    return { success: false, message: "Something is Wrong. Contact Support" };
+  }
+
+  // Now Send the Email via Resend.
+  try {
+    const data = await resend.emails.send({
+      from: "My Portfolio <system@message.shahriardev.me>",
+      to: "shahriarridom.info@gmail.com",
+      replyTo: validated.data.email,
+      subject: `New Message from ${validated.data.name}`,
+      react: ContactFormEmail({
+        name: validated.data.name,
+        email: validated.data.email,
+        message: validated.data.message,
+      }),
+    });
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    // Now it updates the status on DB from PENDING to SENT.
+    await prisma.messages.update({
+      where: { id: messageId },
+      data: { status: "SENT" },
+    });
+  } catch (emailError) {
+    console.error("Email Dispatch Error: ", emailError);
+
+    // Update status on DB to FAILED.
+    await prisma.messages.update({
+      where: { id: messageId },
+      data: { status: "FAILED" },
+    });
+  }
+
+  return { success: true, message: "Message send Successfully" };
 }

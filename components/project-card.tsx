@@ -4,12 +4,13 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Github, ExternalLink } from "lucide-react";
+import { Github, ExternalLink, ArrowRight } from "lucide-react";
 import type { Project } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface ProjectCardProps {
-  project: Project;
+  project: Project & { slug: string };
   index: number;
 }
 
@@ -32,18 +33,16 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
     }
   };
 
-  // Determine card size based on index for a bento-like feel
-  // This is a simple pattern: 0 is large, 1 is tall, 2 is normal, 3 is wide
   const getSizeClasses = (idx: number) => {
     const pattern = idx % 4;
     switch (pattern) {
-      case 0: // Large 2x2
+      case 0:
         return "md:col-span-2 md:row-span-2";
-      case 1: // Tall 1x2
+      case 1:
         return "md:col-span-1 md:row-span-2";
-      case 2: // Normal 1x1
+      case 2:
         return "md:col-span-1 md:row-span-1";
-      case 3: // Wide 2x1
+      case 3:
         return "md:col-span-2 md:row-span-1";
       default:
         return "md:col-span-1 md:row-span-1";
@@ -65,7 +64,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       onMouseLeave={handleMouseLeave}
     >
       {/* Media Background */}
-      <div className="absolute inset-0 w-full h-full">
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
         {project.thumbnailUrl && (
           <Image
             src={project.thumbnailUrl}
@@ -93,13 +92,13 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       </div>
 
       {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 transition-opacity duration-500 pointer-events-none" />
 
       {/* Hover Overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-500" />
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/60 transition-colors duration-500 pointer-events-none" />
 
       {/* Content */}
-      <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between">
+      <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between z-20">
         <div className="flex justify-between items-start">
           <div className="flex gap-2 flex-wrap">
             {project.tags.slice(0, 3).map((tag) => (
@@ -118,6 +117,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 href={project.repoUrl}
                 target="_blank"
                 className="p-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white hover:bg-white hover:text-black transition-colors"
+                aria-label="View Source Code"
               >
                 <Github className="w-4 h-4" />
               </Link>
@@ -127,6 +127,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 href={project.liveUrl}
                 target="_blank"
                 className="p-2 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-white hover:bg-primary hover:text-white transition-colors"
+                aria-label="View Live Project"
               >
                 <ExternalLink className="w-4 h-4" />
               </Link>
@@ -134,13 +135,24 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
         </div>
 
-        <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+        <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex flex-col items-start">
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
             {project.title}
           </h3>
-          <p className="text-white/70 line-clamp-2 text-sm md:text-base">
+          <p className="text-white/70 line-clamp-2 text-sm md:text-base mb-4">
             {project.description}
           </p>
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md transition-all group/btn"
+          >
+            <Link href={`/project/${project.slug}`}>
+              Read More
+              <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+            </Link>
+          </Button>
         </div>
       </div>
     </motion.article>
