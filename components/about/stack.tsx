@@ -33,9 +33,9 @@ export async function AboutSection() {
           <div className="space-y-6 text-muted-foreground text-lg leading-relaxed font-light">
             <p>
               I am a developer who believes in clean code and user-centric
-              design. Currently transitioning from "learning" to "building," I
-              focus on understanding the fundamentals of the web rather than
-              just chasing frameworks.
+              design. Currently transitioning from &quot;learning&quot; to
+              &quot;building,&quot; I focus on understanding the fundamentals of
+              the web rather than just chasing frameworks.
             </p>
             <p>
               My goal is simple: to build applications that are fast,

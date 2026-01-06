@@ -60,7 +60,7 @@ export function Contact() {
               </div>
 
               <h2 className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tighter leading-[1.1] mb-8 text-white">
-                Let's build <br />
+                Let&apos;s build <br />
                 <span className="text-muted-foreground">the future.</span>
               </h2>
 

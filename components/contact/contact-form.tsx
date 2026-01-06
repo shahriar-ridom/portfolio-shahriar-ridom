@@ -38,7 +38,7 @@ export function ContactForm() {
           Send me a message
         </h3>
         <p className="text-sm text-muted-foreground">
-          Fill out the form below and I'll get back to you within 24 hours.
+          Fill out the form below and I&apos;ll get back to you within 24 hours.
         </p>
       </div>
 
