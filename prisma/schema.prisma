@@ -73,6 +73,7 @@ model Messages {
   email     String
   message   String
   createdAt DateTime  @default(now())
+  isRead    Boolean   @default(false)
   status    String
 }
 
