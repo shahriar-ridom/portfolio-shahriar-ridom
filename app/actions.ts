@@ -355,5 +355,24 @@ export async function sendMessage(
     });
   }
 
+  revalidatePath("/admin/messages");
   return { success: true, message: "Message send Successfully" };
+}
+
+// Update Status for Messages
+export async function updateStatus(messageId: string, status: boolean) {
+  await prisma.messages.update({
+    where: { id: messageId },
+    data: { isRead: status },
+  });
+  revalidatePath("/admin/messages");
+}
+
+//Delete Message
+export async function deleteMessage(messageId: string) {
+  try {
+    await prisma.messages.delete({ where: { id: messageId } });
+  } catch (error) {
+    console.error("Server Error: ", error);
+  }
 }

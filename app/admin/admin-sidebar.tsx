@@ -12,12 +12,12 @@ import {
   Cpu,
   Menu,
   X,
-  LucideIcon
+  LucideIcon,
+  Inbox,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 
-// --- Configuration ---
 interface NavItem {
   href: string;
   label: string;
@@ -29,23 +29,19 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/profile", label: "Profile", icon: User },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/skills", label: "Skills", icon: Cpu },
+  { href: "/admin/messages", label: "Inbox", icon: Inbox },
 ];
 
-// --- Sub-Components ---
-
-// 1. Define Props Interface for the extracted component
 interface NavContentProps {
   pathname: string;
   onClose: () => void;
   onLogout: () => void;
 }
 
-// 2. Move NavContent OUTSIDE the main component
 const NavContent = ({ pathname, onClose, onLogout }: NavContentProps) => (
   <div className="flex flex-col h-full">
     <div className="p-6 border-b border-white/10 flex items-center justify-between">
       <h1 className="text-xl font-bold tracking-tighter">Admin Panel</h1>
-      {/* Close button for mobile only */}
       <button
         className="md:hidden p-1 hover:bg-white/10 rounded-md transition-colors"
         onClick={onClose}
@@ -63,7 +59,7 @@ const NavContent = ({ pathname, onClose, onLogout }: NavContentProps) => (
           <Link
             key={item.href}
             href={item.href}
-            onClick={onClose} // Close menu on click (mobile)
+            onClick={onClose}
             className={cn(
               "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium",
               isActive
@@ -89,8 +85,6 @@ const NavContent = ({ pathname, onClose, onLogout }: NavContentProps) => (
     </div>
   </div>
 );
-
-// --- Main Component ---
 
 export function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false);
