@@ -36,7 +36,7 @@ export async function getProfile() {
 
 export async function updateProfile(
   prevState: ActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionState> {
   const rawData = {
     fullName: formData.get("fullName"),
@@ -94,7 +94,7 @@ const projectSchema = z.object({
           .split(",")
           .map((s) => s.trim())
           .filter((s) => s.length > 0)
-      : []
+      : [],
   ),
   featured: z.boolean().optional(),
 });
@@ -122,7 +122,7 @@ export async function getProjectBySlug(slug: string) {
 
 export async function createProject(
   prevState: ActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionState> {
   const rawData = {
     title: formData.get("title"),
@@ -224,7 +224,7 @@ export async function getSkills() {
 
 export async function addSkill(
   prevState: ActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
@@ -283,19 +283,27 @@ const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   message: z.string().min(10, "Message must be at least 10 characters"),
+  fax: z.string().optional(),
 });
 
 const resend = new Resend(process.env.RESEND_API);
 
 export async function sendMessage(
   prevState: ActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
     message: formData.get("message"),
+    fax: formData.get("fax"),
   };
+
+  if (rawData.fax) {
+    console.log("Bot blocked:", rawData.email);
+    return { success: true, message: "Message sent Successfully" };
+  }
+
   const validated = contactSchema.safeParse(rawData);
   if (!validated.success) {
     return {
@@ -305,10 +313,9 @@ export async function sendMessage(
     };
   }
 
-  let messageId: string | number;
+  let messageId: string;
 
   try {
-    // First saves message to Database as PENDING
     const newMessage = await prisma.messages.create({
       data: {
         name: validated.data.name,
@@ -319,10 +326,10 @@ export async function sendMessage(
     });
     messageId = newMessage.id;
   } catch (error) {
-    return { success: false, message: "Something is Wrong. Contact Support" };
+    console.error("DB Save Error:", error);
+    return { success: false, message: "System busy. Please try again later." };
   }
 
-  // Now Send the Email via Resend.
   try {
     const data = await resend.emails.send({
       from: "My Portfolio <system@message.shahriardev.me>",
@@ -340,32 +347,26 @@ export async function sendMessage(
       throw new Error(data.error.message);
     }
 
-    // Now it updates the status on DB from PENDING to SENT.
     await prisma.messages.update({
       where: { id: messageId },
       data: { status: "SENT" },
     });
+
+    revalidatePath("/admin/messages");
+    return { success: true, message: "Message sent successfully!" };
   } catch (emailError) {
     console.error("Email Dispatch Error: ", emailError);
 
-    // Update status on DB to FAILED.
     await prisma.messages.update({
       where: { id: messageId },
       data: { status: "FAILED" },
     });
+
+    return {
+      success: true,
+      message: "Message received (queued). We will be in touch shortly.",
+    };
   }
-
-  revalidatePath("/admin/messages");
-  return { success: true, message: "Message send Successfully" };
-}
-
-// Update Status for Messages
-export async function updateStatus(messageId: string, status: boolean) {
-  await prisma.messages.update({
-    where: { id: messageId },
-    data: { isRead: status },
-  });
-  revalidatePath("/admin/messages");
 }
 
 //Delete Message

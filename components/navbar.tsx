@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { m, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
-import Image from "next/image";
-import logo from "@/app/favicon.ico";
+import { useState, useEffect } from "react";
+import Logo from "./logo";
 
 const NAV_LINKS = [
   { name: "About", href: "#about" },
@@ -13,89 +12,111 @@ const NAV_LINKS = [
   { name: "Contact", href: "#contact" },
 ];
 
+const menuVariants = {
+  closed: {
+    opacity: 0,
+    y: -20,
+    transition: { staggerChildren: 0.05, staggerDirection: -1 },
+  },
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
+
+const linkVariants = {
+  closed: { opacity: 0, y: 20 },
+  open: { opacity: 1, y: 0 },
+};
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   return (
     <>
       <m.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between w-full max-w-[1200px] mx-auto p-6 md:p-10 pointer-events-none"
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between w-full max-w-6xl mx-auto p-6 md:p-8 pointer-events-none"
       >
-        {/* Logo Section */}
-        <div className="pointer-events-auto flex items-center gap-2 select-none group cursor-pointer">
+        {/* Logo */}
+        <div className="pointer-events-auto cursor-pointer z-50">
           <Link href="/">
-            <div className="flex items-center justify-center size-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm group-hover:border-primary/50 transition-colors">
-              <Image
-                src={logo}
-                width={25}
-                height={25}
-                alt="Shahriar Ridom Logo"
-                className="opacity-90 group-hover:opacity-100 transition-opacity"
-              />
+            <div className="flex items-center justify-center size-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-md transition-colors hover:border-white/20 hover:bg-white/10">
+              <Logo className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" />
             </div>
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <div className="pointer-events-auto hidden md:flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1.5 backdrop-blur-md shadow-lg shadow-black/5">
+        {/* Desktop Nav */}
+        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1.5 backdrop-blur-md">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.name}
               href={link.href}
-              className="px-5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all"
+              className="px-4 py-1.5 text-sm font-medium text-neutral-400 hover:text-white transition-colors rounded-full hover:bg-white/5"
             >
               {link.name}
             </Link>
           ))}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="pointer-events-auto w-10 flex items-center justify-end">
+        {/* Mobile Toggle */}
+        <div className="pointer-events-auto md:hidden">
           <button
-            onClick={toggleMenu}
+            onClick={() => setIsOpen(true)}
             aria-label="Open Menu"
-            className="md:hidden text-white/70 hover:text-white pointer-events-auto p-2"
+            className="text-neutral-400 hover:text-white transition-colors p-2"
           >
             <Menu className="w-6 h-6" />
           </button>
         </div>
       </m.nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Overlay */}
       <AnimatePresence>
         {isOpen && (
           <m.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center"
+            initial="closed"
+            animate="open"
+            exit="closed"
+            variants={menuVariants}
+            className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-xl md:hidden flex flex-col items-center justify-center"
           >
             <button
-              onClick={toggleMenu}
+              onClick={() => setIsOpen(false)}
               aria-label="Close Menu"
-              className="absolute top-6 right-6 text-white/70 hover:text-white p-4"
+              className="absolute top-6 right-6 text-neutral-400 hover:text-white p-4"
             >
               <X className="w-8 h-8" />
             </button>
 
-            <div className="flex flex-col items-center gap-8">
+            <nav className="flex flex-col items-center gap-8">
               {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={toggleMenu}
-                  className="text-2xl font-medium text-white/70 hover:text-white transition-colors"
-                >
-                  {link.name}
-                </Link>
+                <m.div key={link.name} variants={linkVariants}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className="text-3xl font-light tracking-tight text-white/90 hover:text-white transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                </m.div>
               ))}
-            </div>
+            </nav>
           </m.div>
         )}
       </AnimatePresence>

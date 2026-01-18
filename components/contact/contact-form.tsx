@@ -12,7 +12,7 @@ const initialState = { success: false, message: "", errors: {} };
 export function ContactForm() {
   const [state, formAction, isPending] = useActionState(
     sendMessage,
-    initialState
+    initialState,
   );
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -43,6 +43,12 @@ export function ContactForm() {
       </div>
 
       <form ref={formRef} action={formAction} className="flex flex-col gap-6">
+        <div
+          className="absolute opacity-0 -z-50 select-none pointer-events-none"
+          aria-hidden="true"
+        >
+          <input type="text" name="fax" tabIndex={-1} autoComplete="off" />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <InputGroup
             name="name"
@@ -136,7 +142,7 @@ function InputGroup({
           "peer w-full bg-white/5 border rounded-xl px-4 py-4 text-base text-white focus:ring-2 focus:ring-primary/50 placeholder-transparent transition-all duration-300 outline-none",
           error
             ? "border-red-500/50 focus:border-red-500"
-            : "border-white/10 focus:border-primary"
+            : "border-white/10 focus:border-primary",
         )}
       />
       <label

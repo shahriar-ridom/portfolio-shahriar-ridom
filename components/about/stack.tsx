@@ -1,7 +1,9 @@
 import { getProfile, getProjects, getSkills } from "@/app/actions";
-import { Download, Globe, Code2, Terminal } from "lucide-react";
+import { Download, Globe, Code2, Zap } from "lucide-react";
 import { SkillsTabs } from "./skill-tabs";
 import { TechMarquee } from "./tech-marquee";
+import Link from "next/link";
+
 export async function AboutSection() {
   const [profile, skills, projects] = await Promise.all([
     getProfile().catch(() => null),
@@ -14,14 +16,14 @@ export async function AboutSection() {
   return (
     <section
       id="about"
-      className="py-24 px-6 md:px-10 w-full max-w-[1200px] mx-auto overflow-hidden"
+      className="py-24 px-6 md:px-10 w-full max-w-300 mx-auto overflow-hidden"
     >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
         <div className="lg:col-span-5 flex flex-col justify-center">
           <div className="mb-6">
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-1.5 text-xs font-mono font-medium tracking-wide text-emerald-500 shadow-glow">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              OPEN TO WORK
+              SYSTEMS THINKING
             </span>
           </div>
 
@@ -32,14 +34,15 @@ export async function AboutSection() {
 
           <div className="space-y-6 text-muted-foreground text-lg leading-relaxed font-light">
             <p>
-              I am a developer who believes in clean code and user-centric
-              design. Currently transitioning from &quot;learning&quot; to
-              &quot;building,&quot; I focus on understanding the fundamentals of
-              the web rather than just chasing frameworks.
+              I build accessible, pixel-perfect web applications with a focus on
+              performance. My development philosophy is rooted in robust
+              architectural patterns rather than just chasing the latest
+              framework trends.
             </p>
             <p>
-              My goal is simple: to build applications that are fast,
-              accessible, and maintainable.
+              Whether it&apos;s a complex dashboard or a high-conversion landing
+              page, my goal is to ship code that is maintainable, type-safe, and
+              scalable.
             </p>
           </div>
 
@@ -47,12 +50,12 @@ export async function AboutSection() {
             <StatItem
               icon={<Code2 className="w-4 h-4 mb-2 text-primary" />}
               value={projectCount}
-              label="Core Projects"
+              label="Shipped Projects"
             />
             <StatItem
-              icon={<Terminal className="w-4 h-4 mb-2 text-blue-400" />}
-              value="100%"
-              label="Commitment"
+              icon={<Zap className="w-4 h-4 mb-2 text-blue-400" />}
+              value="< 24h"
+              label="Response Time"
             />
             <StatItem
               icon={<Globe className="w-4 h-4 mb-2 text-green-400" />}
@@ -61,33 +64,32 @@ export async function AboutSection() {
             />
           </div>
 
-          <div className="flex justify-start gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-start gap-4">
             {profile?.resumeLink ? (
-              <a
+              <Link
                 href={profile.resumeLink}
                 target="_blank"
                 rel="noreferrer"
-                className="group relative flex items-center justify-center overflow-hidden rounded-full bg-primary h-12 px-8 text-primary-foreground shadow-[0_0_20px_-5px_#3c83f6] transition-all hover:bg-blue-600 hover:text-white hover:scale-105 active:scale-95"
+                className="group relative flex items-center justify-center overflow-hidden rounded-full bg-primary h-12 px-8 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
               >
                 <Download className="mr-2 w-5 h-5" />
                 <span className="text-sm font-bold tracking-wide">
                   Download CV
                 </span>
-              </a>
-            ) : (
-              <a
-                href="https://github.com/shahriar-ridom"
-                target="_blank"
-                className="group flex items-center justify-center rounded-full bg-white/10 h-12 px-8 text-white hover:bg-white/20 transition-all"
-              >
-                <span className="text-sm font-medium">View GitHub</span>
-              </a>
-            )}
+              </Link>
+            ) : null}
+            <Link
+              href="https://github.com/shahriar-ridom"
+              target="_blank"
+              className="group flex items-center justify-center rounded-full bg-white/5 border border-white/10 h-12 px-8 text-white hover:bg-white/10 transition-all"
+            >
+              <span className="text-sm font-medium">View GitHub</span>
+            </Link>
           </div>
         </div>
 
         <div className="lg:col-span-7 flex flex-col justify-center relative">
-          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+          <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-100 h-100 bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
           <SkillsTabs skills={skills} />
         </div>

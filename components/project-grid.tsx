@@ -1,39 +1,55 @@
 import { getProjects } from "@/app/actions";
 import { ProjectCard } from "@/components/project-card";
-import { Loader2 } from "lucide-react";
-import { Suspense } from "react";
-export const dynamic = "force-dyanmic";
+
+export const dynamic = "force-dynamic";
+
+function getBentoClass(index: number) {
+  if (index === 0) {
+    return "md:col-span-2 md:row-span-2";
+  }
+
+  if (index === 3 || index === 6) {
+    return "md:col-span-2 md:row-span-1";
+  }
+
+  return "md:col-span-1 md:row-span-1";
+}
 
 export async function ProjectGrid() {
   const projects = await getProjects();
+
   return (
     <section
       id="projects"
-      className="py-20 px-6 md:px-10 w-full max-w-[1200px] mx-auto"
+      className="py-24 px-6 md:px-10 w-full max-w-300 mx-auto"
     >
-      <div className="mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="space-y-4 max-w-2xl">
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-white/40">
+      <div className="mb-16 md:mb-24 flex flex-col md:flex-row md:items-end justify-between gap-10">
+        <div className="space-y-6 max-w-2xl">
+          <h2 className="text-4xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-linear-to-br from-white via-white to-white/40">
             Selected Works
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground font-light leading-relaxed max-w-lg">
+          <p className="text-lg md:text-xl text-muted-foreground font-light leading-relaxed max-w-lg">
             Exploring the intersection of design and engineering. Building
-            digital experiences in the Deep Space.
+            digital experiences that scale.
           </p>
         </div>
 
-        <div className="hidden md:flex flex-col items-end gap-2 text-white/30">
-          <span className="text-xs uppercase tracking-[0.2em]">Scroll</span>
-          <div className="h-12 w-[1px] bg-gradient-to-b from-transparent via-white/30 to-transparent"></div>
+        <div className="hidden md:flex flex-col items-end gap-3 text-white/20">
+          <span className="text-[10px] uppercase tracking-[0.2em] font-mono">
+            Scroll
+          </span>
+          <div className="h-16 w-px bg-linear-to-b from-transparent via-white/20 to-transparent"></div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 auto-rows-[280px]">
-        <Suspense fallback={<Loader2 className="h-4 w-4 animate-spin" />}>
-          {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
-        </Suspense>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 auto-rows-[280px] grid-flow-dense">
+        {projects.map((project, index) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            index={index}
+            className={getBentoClass(index)}
+          />
+        ))}
       </div>
     </section>
   );
