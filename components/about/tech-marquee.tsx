@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react"; // <--- Add this
 import { getIcon } from "@/lib/icons";
 
 type Skill = {
@@ -24,6 +25,10 @@ export function TechMarquee({ skills }: { skills: Skill[] }) {
       </div>
 
       <div className="relative w-full py-10 mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        {/* Optimization Note:
+          Ensure 'animate-scroll' in your tailwind config uses 'transform: translate3d'
+          to trigger hardware acceleration, otherwise this marquee will eat CPU.
+        */}
         <div className="flex w-max animate-scroll gap-16 items-center hover:paused will-change-transform">
           <ul className="flex items-center gap-16">
             {marqueeSkills.map((tech) => (
@@ -43,7 +48,10 @@ export function TechMarquee({ skills }: { skills: Skill[] }) {
 }
 
 function TechItem({ tech }: { tech: Skill }) {
-  const Icon = getIcon(tech.iconName);
+  // FIX: Memoize the icon component.
+  // This prevents the "Component created during render" error
+  // and ensures React doesn't unmount/remount the icon on every render.
+  const Icon = useMemo(() => getIcon(tech.iconName), [tech.iconName]);
 
   if (!Icon) return null;
 
