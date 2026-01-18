@@ -53,8 +53,9 @@ export function HeroUi({ profile }: HeroUiProps) {
           alt={fullName}
           fill
           className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+          priority={true}
+          quality={60}
+          sizes="(max-width: 768px) 90vw, (max-width: 1200px) 50vw, 600px"
         />
 
         <div className="absolute bottom-6 left-6 z-20 flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full">

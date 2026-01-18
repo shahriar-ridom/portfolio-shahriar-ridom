@@ -393,3 +393,15 @@ export async function updateStatus(messageId: string, status: boolean) {
     });
   } catch (error) {}
 }
+
+// Get Project Via Slug
+export const getProjectViaSlug = async (slug: string) => {
+  try {
+    const project = await prisma.project.findUnique({
+      where: { slug },
+    });
+    return project;
+  } catch (error) {
+    console.error(error);
+  }
+};
