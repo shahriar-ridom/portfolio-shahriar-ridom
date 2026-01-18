@@ -38,7 +38,10 @@ export const getProfile = unstable_cache(
   { revalidate: 3600, tags: ["profile"] },
 );
 
-export async function updateProfile(formData: FormData): Promise<ActionState> {
+export async function updateProfile(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const rawData = {
     fullName: formData.get("fullName"),
     title: formData.get("title"),
