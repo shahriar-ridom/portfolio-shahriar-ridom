@@ -93,7 +93,7 @@ export function ContactForm() {
             disabled={isPending}
             className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-xl bg-primary px-8 font-medium text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:scale-[1.02] disabled:pointer-events-none disabled:opacity-50"
           >
-            <div className="absolute inset-0 flex items-center justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
+            <div className="absolute inset-0 flex items-center justify-center transform-[skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:transform-[skew(-12deg)_translateX(100%)]">
               <div className="relative h-full w-8 bg-white/20" />
             </div>
 

@@ -92,7 +92,6 @@ export function AdminSidebar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    // Ideally, wrap this in a try/catch, but for now we keep existing logic
     await supabase.auth.signOut();
     router.push("/login");
   };
@@ -128,10 +127,6 @@ export function AdminSidebar() {
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* 3. Pass the dependencies down as props.
-           Now React knows NavContent is the same component,
-           and only updates the parts of the DOM that actually changed.
-        */}
         <NavContent
           pathname={pathname}
           onClose={() => setIsOpen(false)}

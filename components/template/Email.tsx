@@ -56,9 +56,6 @@ export default function ContactFormEmail({
   );
 }
 
-// Styles
-// I keep these inline because email clients strip external CSS.
-// React Email handles the inlining for you, but defining them here keeps code clean.
 
 const main = {
   backgroundColor: "#f6f9fc",
@@ -116,7 +113,7 @@ const paragraph = {
   fontSize: "16px",
   lineHeight: "26px",
   textAlign: "left" as const,
-  whiteSpace: "pre-wrap", // Preserves line breaks from the user's input
+  whiteSpace: "pre-wrap",
 };
 
 const hr = {

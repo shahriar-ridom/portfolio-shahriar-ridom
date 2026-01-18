@@ -4,62 +4,48 @@ import { useState, useMemo } from "react";
 import { m, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getIcon } from "@/lib/icons";
-import type { Skill } from "@prisma/client";
+
+type Skill = {
+  name: string;
+  id?: string;
+  category: string;
+  level?: number;
+  iconName: string;
+};
 
 interface SkillsTabsProps {
   skills: Skill[];
 }
 
-const getSkillLevelLabel = (level: number) => {
-  if (level >= 80)
-    return {
-      label: "Core Stack",
-      color: "text-green-400 bg-green-400/10 border-green-400/20",
-    };
-  if (level >= 50)
-    return {
-      label: "Competent",
-      color: "text-blue-400 bg-blue-400/10 border-blue-400/20",
-    };
-  return {
-    label: "Exploring",
-    color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-  };
-};
-
 const containerVariants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 5 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.4,
-      staggerChildren: 0.05,
+      duration: 0.3,
+      staggerChildren: 0.03,
     },
   },
-  exit: { opacity: 0, y: -10, transition: { duration: 0.2 } },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, x: -10 },
+  hidden: { opacity: 0, x: -5 },
   visible: { opacity: 1, x: 0 },
 };
 
 export function SkillsTabs({ skills }: SkillsTabsProps) {
   const [activeTab, setActiveTab] = useState<"FRONTEND" | "BACKEND" | "DEVOPS">(
-    "FRONTEND"
+    "FRONTEND",
   );
 
   const currentSkills = useMemo(
-    () =>
-      skills
-        .filter((s) => s.category === activeTab)
-        .sort((a, b) => b.level - a.level),
-    [skills, activeTab]
+    () => skills.filter((s) => s.category === activeTab),
+    [skills, activeTab],
   );
 
   return (
-    <div className="relative bg-black/50 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl h-full flex flex-col">
+    <div className="relative bg-black/50 border border-white/10 rounded-3xl p-8 shadow-2xl h-full flex flex-col">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h3 className="text-2xl font-bold text-white">Technical Arsenal</h3>
@@ -74,10 +60,10 @@ export function SkillsTabs({ skills }: SkillsTabsProps) {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "px-4 py-1.5 rounded-full text-xs font-medium transition-all relative z-0",
+                "px-4 py-1.5 rounded-full text-xs font-medium transition-colors relative z-0",
                 activeTab === tab
                   ? "text-white"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  : "text-zinc-400 hover:text-zinc-200",
               )}
             >
               {activeTab === tab && (
@@ -93,30 +79,46 @@ export function SkillsTabs({ skills }: SkillsTabsProps) {
         </div>
       </div>
 
-      <div className="flex-1 min-h-[300px]">
-        <AnimatePresence mode="wait">
+      <div className="flex-1 min-h-75">
+        <AnimatePresence mode="popLayout">
           <m.div
             key={activeTab}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            exit="exit"
             className="grid grid-cols-1 gap-3"
           >
             {currentSkills.length > 0 ? (
               currentSkills.map((skill) => {
                 const Icon = getIcon(skill.iconName);
-                const { label, color } = getSkillLevelLabel(skill.level);
+
+                const isCore = (skill.level || 0) >= 80;
+                const isCompetent = (skill.level || 0) >= 50;
+
+                const label = isCore
+                  ? "Core Stack"
+                  : isCompetent
+                    ? "Competent"
+                    : "Exploring";
+                const colorClass = isCore
+                  ? "text-green-400 bg-green-400/10 border-green-400/20"
+                  : isCompetent
+                    ? "text-blue-400 bg-blue-400/10 border-blue-400/20"
+                    : "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
 
                 return (
                   <m.div
-                    key={skill.id}
+                    key={skill.name}
                     variants={itemVariants}
-                    className="group relative flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all duration-300"
+                    className="group relative flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2.5 bg-black/40 rounded-lg border border-white/5 group-hover:border-primary/50 group-hover:text-primary transition-colors text-zinc-400">
-                        <Icon className="w-5 h-5" />
+                      <div className="flex items-center justify-center w-10 h-10 bg-black/40 rounded-lg border border-white/5 group-hover:border-primary/50 group-hover:text-primary transition-colors text-zinc-400">
+                        {Icon ? (
+                          <Icon className="w-5 h-5" />
+                        ) : (
+                          <div className="w-5 h-5 bg-zinc-800 rounded-full" />
+                        )}
                       </div>
 
                       <div className="flex flex-col">
@@ -127,8 +129,8 @@ export function SkillsTabs({ skills }: SkillsTabsProps) {
                           {activeTab === "FRONTEND"
                             ? "UI & Interactivity"
                             : activeTab === "BACKEND"
-                            ? "Server & Data"
-                            : "Infrastructure"}
+                              ? "Server & Data"
+                              : "Infrastructure"}
                         </span>
                       </div>
                     </div>
@@ -136,7 +138,7 @@ export function SkillsTabs({ skills }: SkillsTabsProps) {
                     <div
                       className={cn(
                         "px-2.5 py-1 rounded-md text-[10px] font-medium tracking-wide uppercase border",
-                        color
+                        colorClass,
                       )}
                     >
                       {label}

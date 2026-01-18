@@ -17,7 +17,7 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.1, // Reduced delay for snappier feel
+      delayChildren: 0.1,
     },
   },
 };
@@ -27,7 +27,7 @@ const itemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: "easeOut" }, // Faster (0.5 -> 0.4)
+    transition: { duration: 0.4, ease: "easeOut" },
   },
 };
 

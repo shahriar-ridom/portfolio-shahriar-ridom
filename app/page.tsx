@@ -1,26 +1,41 @@
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
-import { ProjectGrid } from "@/components/project-grid";
-import { AboutSection } from "@/components/about/stack";
-import { Contact } from "@/components/contact/contact";
-import { HeroGlow } from "@/components/ui/hero-glow";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const AboutSection = dynamic(
+  () => import("@/components/about/stack").then((mod) => mod.AboutSection),
+  {
+    loading: () => <div className="h-96" />,
+    ssr: true,
+  },
+);
+
+const ProjectGrid = dynamic(
+  () => import("@/components/project-grid").then((mod) => mod.ProjectGrid),
+  {
+    loading: () => <ProjectLoader />,
+  },
+);
+
+const Contact = dynamic(() =>
+  import("@/components/contact/contact").then((mod) => mod.Contact),
+);
+
+const ProjectLoader = () => (
+  <div className="flex items-center justify-center py-20 text-white/50">
+    <Loader2 className="w-6 h-6 animate-spin" />
+  </div>
+);
 
 export default function Home() {
   return (
     <main className="min-h-screen w-full bg-background bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))]">
-      <HeroGlow />
       <Navbar />
       <Hero />
       <AboutSection />
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center py-20 text-white/50">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
-        }
-      >
+      <Suspense fallback={<ProjectLoader />}>
         <ProjectGrid />
       </Suspense>
       <Contact />

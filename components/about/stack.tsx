@@ -13,6 +13,21 @@ export async function AboutSection() {
 
   const projectCount: string = projects?.length.toString() || "0";
 
+  const minimalSkills = skills?.map((s) => ({
+    name: s.name,
+    id: s.id,
+    category: s.category,
+    level: s.level,
+    iconName: s.iconName,
+  }));
+  const marqueeSkills = skills?.map((s) => ({
+    name: s.name,
+    id: s.id,
+    color: s.color,
+    iconName: s.iconName,
+    showInMarquee: s.showInMarquee,
+  }));
+
   return (
     <section
       id="about"
@@ -91,12 +106,12 @@ export async function AboutSection() {
         <div className="lg:col-span-7 flex flex-col justify-center relative">
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-100 h-100 bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-          <SkillsTabs skills={skills} />
+          <SkillsTabs skills={minimalSkills} />
         </div>
       </div>
 
       <div className="mt-20 opacity-60 hover:opacity-100 transition-opacity duration-500">
-        <TechMarquee skills={skills} />
+        <TechMarquee skills={marqueeSkills} />
       </div>
     </section>
   );
