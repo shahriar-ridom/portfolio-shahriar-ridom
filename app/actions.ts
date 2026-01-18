@@ -377,3 +377,13 @@ export async function deleteMessage(messageId: string) {
     console.error("Server Error: ", error);
   }
 }
+
+//Update Status
+export async function updateStatus(messageId: string, status: boolean) {
+  try {
+    await prisma.messages.update({
+      where: { id: messageId },
+      data: { isRead: status },
+    });
+  } catch (error) {}
+}
