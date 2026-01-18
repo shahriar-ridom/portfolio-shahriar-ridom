@@ -291,7 +291,10 @@ const contactSchema = z.object({
 
 const resend = new Resend(process.env.RESEND_API);
 
-export async function sendMessage(formData: FormData): Promise<ActionState> {
+export async function sendMessage(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
