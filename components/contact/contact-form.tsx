@@ -10,8 +10,18 @@ import { cn } from "@/lib/utils";
 const initialState = { success: false, message: "", errors: {} };
 
 export function ContactForm() {
-  const [state, formAction, isPending] = useActionState(
-    sendMessage,
+  interface FormState {
+    success: boolean;
+    message: string;
+    errors?: {
+      name?: string[];
+      email?: string[];
+      message?: string[];
+    };
+  }
+
+  const [state, formAction, isPending] = useActionState<FormState, FormData>(
+    (_state: FormState, formData: FormData) => sendMessage(formData),
     initialState,
   );
   const formRef = useRef<HTMLFormElement>(null);

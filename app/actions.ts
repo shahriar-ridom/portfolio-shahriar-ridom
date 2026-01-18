@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
@@ -25,19 +25,20 @@ const profileSchema = z.object({
   resumeLink: z.string().optional().or(z.literal("")),
 });
 
-export async function getProfile() {
-  try {
-    return await prisma.profile.findFirst();
-  } catch (error) {
-    console.error("Failed to fetch profile:", error);
-    return null;
-  }
-}
+export const getProfile = unstable_cache(
+  async () => {
+    try {
+      return await prisma.profile.findFirst();
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+      return null;
+    }
+  },
+  ["user-profile"],
+  { revalidate: 3600, tags: ["profile"] },
+);
 
-export async function updateProfile(
-  prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+export async function updateProfile(formData: FormData): Promise<ActionState> {
   const rawData = {
     fullName: formData.get("fullName"),
     title: formData.get("title"),
@@ -99,16 +100,20 @@ const projectSchema = z.object({
   featured: z.boolean().optional(),
 });
 
-export async function getProjects() {
-  try {
-    return await prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-  } catch (error) {
-    console.error("Failed to fetch projects:", error);
-    return [];
-  }
-}
+export const getProjects = unstable_cache(
+  async () => {
+    try {
+      return await prisma.project.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      return [];
+    }
+  },
+  ["user-projects"],
+  { revalidate: 3600, tags: ["projects"] },
+);
 
 export async function getProjectBySlug(slug: string) {
   try {
@@ -120,10 +125,7 @@ export async function getProjectBySlug(slug: string) {
   }
 }
 
-export async function createProject(
-  prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+export async function createProject(formData: FormData): Promise<ActionState> {
   const rawData = {
     title: formData.get("title"),
     slug: formData.get("slug"),
@@ -210,22 +212,23 @@ const skillSchema = z.object({
   showInMarquee: z.boolean().optional(),
 });
 
-export async function getSkills() {
-  try {
-    const skills = await prisma.skill.findMany({
-      orderBy: { order: "asc" },
-    });
-    return skills;
-  } catch (error) {
-    console.error("Failed to fetch skills:", error);
-    return [];
-  }
-}
+export const getSkills = unstable_cache(
+  async () => {
+    try {
+      const skills = await prisma.skill.findMany({
+        orderBy: { order: "asc" },
+      });
+      return skills;
+    } catch (error) {
+      console.error("Failed to fetch skills:", error);
+      return [];
+    }
+  },
+  ["user-skills"],
+  { revalidate: 3600, tags: ["skills"] },
+);
 
-export async function addSkill(
-  prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+export async function addSkill(formData: FormData): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     category: formData.get("category"),
@@ -288,10 +291,7 @@ const contactSchema = z.object({
 
 const resend = new Resend(process.env.RESEND_API);
 
-export async function sendMessage(
-  prevState: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+export async function sendMessage(formData: FormData): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),
@@ -299,6 +299,7 @@ export async function sendMessage(
     fax: formData.get("fax"),
   };
 
+  //  Bot Prevention
   if (rawData.fax) {
     console.log("Bot blocked:", rawData.email);
     return { success: true, message: "Message sent Successfully" };
