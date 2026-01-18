@@ -50,7 +50,6 @@ export function Contact() {
       className="relative w-full bg-black pt-24 pb-10 overflow-hidden"
     >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-125 bg-primary/5 blur-[120px] rounded-full pointer-events-none translate-z-0 will-change-transform" />
-
       <div className="w-full max-w-300 mx-auto px-6 md:px-10 z-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start mb-24">
           <m.div

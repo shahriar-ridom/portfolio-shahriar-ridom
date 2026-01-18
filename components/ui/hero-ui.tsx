@@ -10,13 +10,18 @@ interface HeroUiProps {
   profile: Profile | null;
 }
 
+// Optimized Text Stagger
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
+<<<<<<< HEAD
       delayChildren: 0.1,
+=======
+      delayChildren: 0.1, // Reduced delay for snappier feel
+>>>>>>> origin/main
     },
   },
 };
@@ -26,7 +31,11 @@ const itemVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
+<<<<<<< HEAD
     transition: { duration: 0.4, ease: "easeOut" },
+=======
+    transition: { duration: 0.4, ease: "easeOut" }, // Faster (0.5 -> 0.4)
+>>>>>>> origin/main
   },
 };
 

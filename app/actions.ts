@@ -310,13 +310,6 @@ export async function sendMessage(
     message: formData.get("message"),
     fax: formData.get("fax"),
   };
-
-  //  Bot Prevention
-  if (rawData.fax) {
-    console.log("Bot blocked:", rawData.email);
-    return { success: true, message: "Message sent Successfully" };
-  }
-
   const validated = contactSchema.safeParse(rawData);
   if (!validated.success) {
     return {
