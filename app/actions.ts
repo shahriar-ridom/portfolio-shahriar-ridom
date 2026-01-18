@@ -128,7 +128,10 @@ export async function getProjectBySlug(slug: string) {
   }
 }
 
-export async function createProject(formData: FormData): Promise<ActionState> {
+export async function createProject(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const rawData = {
     title: formData.get("title"),
     slug: formData.get("slug"),
@@ -231,7 +234,10 @@ export const getSkills = unstable_cache(
   { revalidate: 3600, tags: ["skills"] },
 );
 
-export async function addSkill(formData: FormData): Promise<ActionState> {
+export async function addSkill(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
   const rawData = {
     name: formData.get("name"),
     category: formData.get("category"),
