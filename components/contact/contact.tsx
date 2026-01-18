@@ -1,6 +1,7 @@
 "use client";
 
 import { m } from "framer-motion";
+import { useState } from "react";
 import {
   Github,
   Linkedin,
@@ -8,8 +9,11 @@ import {
   type LucideIcon,
   Instagram,
   Mail,
+  Check,
+  Copy,
 } from "lucide-react";
 import { ContactForm } from "./contact-form";
+import { cn } from "@/lib/utils";
 
 const EMAIL = "shahriarridom.info@gmail.com";
 
@@ -28,8 +32,16 @@ const SOCIALS = [
 ];
 
 export function Contact() {
+  const [copied, setCopied] = useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(EMAIL);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -37,9 +49,9 @@ export function Contact() {
       id="contact"
       className="relative w-full bg-black pt-24 pb-10 overflow-hidden"
     >
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-125 bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="w-full max-w-[1200px] mx-auto px-6 md:px-10 z-10 relative">
+      <div className="w-full max-w-300 mx-auto px-6 md:px-10 z-10 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start mb-24">
           <m.div
             initial={{ opacity: 0, y: 20 }}
@@ -51,10 +63,10 @@ export function Contact() {
             <div>
               <div className="flex items-center gap-3 mb-8">
                 <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                 </span>
-                <span className="uppercase tracking-widest text-xs font-mono text-green-400">
+                <span className="uppercase tracking-widest text-xs font-mono text-emerald-400">
                   Available for work
                 </span>
               </div>
@@ -66,8 +78,8 @@ export function Contact() {
 
               <p className="text-lg text-muted-foreground/80 max-w-md leading-relaxed font-light">
                 I am currently looking for a team where I can contribute to
-                meaningful products. Whether you have a question, a job
-                opportunity, or just want to connect, my inbox is always open.
+                meaningful products. Whether you have a question or just want to
+                connect, my inbox is always open.
               </p>
             </div>
 
@@ -76,13 +88,42 @@ export function Contact() {
                 <p className="text-xs text-muted-foreground/50 mb-4 uppercase tracking-widest font-mono">
                   Direct Contact
                 </p>
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="text-xl md:text-3xl font-medium text-zinc-100 hover:text-primary transition-colors flex items-center gap-4 group w-fit"
+                <button
+                  onClick={handleCopyEmail}
+                  className="group flex items-center gap-4 text-xl md:text-3xl font-medium text-zinc-100 hover:text-primary transition-colors text-left"
+                  title="Click to copy email"
                 >
                   <Mail className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground group-hover:text-primary transition-colors" />
-                  {EMAIL}
-                </a>
+                  <span>{EMAIL}</span>
+
+                  <div className="relative ml-2">
+                    <div
+                      className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 transition-all duration-300",
+                        copied ? "opacity-100 scale-100" : "opacity-0 scale-50",
+                      )}
+                    >
+                      <Check className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <div
+                      className={cn(
+                        "absolute left-0 top-1/2 -translate-y-1/2 transition-all duration-300",
+                        copied
+                          ? "opacity-0 scale-50"
+                          : "opacity-0 group-hover:opacity-100 scale-100",
+                      )}
+                    >
+                      <Copy className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  </div>
+                </button>
+                <div className="h-4 mt-2">
+                  {copied && (
+                    <span className="text-xs text-emerald-500 font-mono animate-in fade-in slide-in-from-left-2">
+                      Email copied to clipboard!
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-4">
@@ -102,7 +143,7 @@ export function Contact() {
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-center md:text-left">
             <span>© {new Date().getFullYear()} Shahriar Ridom</span>
             <span className="hidden md:inline text-white/10">•</span>
-            <span>Built with Next.js 16, React Server Actions & Tailwind</span>
+            <span>Built with Next.js, Server Actions & Tailwind</span>
           </div>
 
           <button
@@ -133,9 +174,9 @@ function SocialLink({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={name}
-      className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary hover:text-white transition-all duration-300 group"
+      className="w-14 h-14 rounded-2xl bg-zinc-900 border border-white/10 flex items-center justify-center hover:bg-primary hover:border-primary transition-all duration-300 group"
     >
-      <Icon className="w-6 h-6 text-zinc-400 group-hover:text-gray-800 group-hover:scale-110 transition-colors" />
+      <Icon className="w-6 h-6 text-zinc-400 group-hover:text-white group-hover:scale-110 transition-all" />
     </a>
   );
 }
