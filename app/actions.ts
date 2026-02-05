@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
-import { revalidatePath, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
@@ -75,6 +75,7 @@ export async function updateProfile(
     }
 
     revalidatePath("/");
+    revalidateTag("hero-data", "max");
     revalidatePath("/admin/profile");
     return { success: true, message: "Profile updated successfully" };
   } catch (error) {
@@ -269,7 +270,7 @@ export async function addSkill(
       },
     });
 
-    revalidatePath("/");
+    revalidateTag("about-data", "max");
     revalidatePath("/admin/skills");
     return { success: true, message: "Skill added!" };
   } catch (error) {
@@ -281,7 +282,7 @@ export async function addSkill(
 export async function deleteSkill(id: string): Promise<ActionState> {
   try {
     await prisma.skill.delete({ where: { id } });
-    revalidatePath("/");
+    revalidateTag("about-data", "max");
     revalidatePath("/admin/skills");
     return { success: true, message: "Skill deleted" };
   } catch (error) {
@@ -298,12 +299,11 @@ const contactSchema = z.object({
   fax: z.string().optional(),
 });
 
-const resend = new Resend(process.env.RESEND_API);
-
 export async function sendMessage(
   prevState: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const resend = new Resend(process.env.RESEND_API)!;
   const rawData = {
     name: formData.get("name"),
     email: formData.get("email"),

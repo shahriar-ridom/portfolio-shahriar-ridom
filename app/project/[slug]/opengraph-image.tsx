@@ -31,6 +31,7 @@ export default async function Image({
     >
       <img
         src={project?.thumbnailUrl}
+        alt={project?.title}
         style={{
           position: "absolute",
           top: 0,

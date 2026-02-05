@@ -54,14 +54,6 @@ export function ProjectCard({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link
-        href={`/project/${project.slug}`}
-        className="absolute inset-0 z-10"
-        aria-label={`View project: ${project.title}`}
-      >
-        <span className="sr-only">View Project</span>
-      </Link>
-
       <div className="absolute inset-0 pointer-events-none bg-neutral-800">
         {project.thumbnailUrl && (
           <Image
@@ -144,10 +136,11 @@ export function ProjectCard({
           <p className="text-white/60 line-clamp-2 text-sm mb-4">
             {project.description}
           </p>
-
-          <div className="flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 -translate-x-4 group-hover:translate-x-0">
-            Read Case Study <ArrowRight className="w-4 h-4 ml-2" />
-          </div>
+          <Link href={`/projects/${project.slug}`}>
+            <div className="flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 group-hover:cursor-pointer transition-opacity duration-300 -translate-x-4 group-hover:translate-x-0">
+              View Project Details <ArrowRight className="w-4 h-4 ml-2" />
+            </div>
+          </Link>
         </div>
       </div>
     </m.article>

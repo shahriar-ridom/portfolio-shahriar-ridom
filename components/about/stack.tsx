@@ -3,16 +3,72 @@ import { Download, Globe, Code2, Zap } from "lucide-react";
 import { SkillsTabs } from "./skill-tabs";
 import { TechMarquee } from "./tech-marquee";
 import Link from "next/link";
+import { cacheLife, cacheTag } from "next/cache";
+import { Suspense } from "react";
 
-export async function AboutSection() {
-  const [profile, skills, projects] = await Promise.all([
+// About statistics component
+async function AboutStat() {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("about-stats");
+
+  const [profile, projects] = await Promise.all([
     getProfile().catch(() => null),
-    getSkills().catch(() => []),
     getProjects().catch(() => []),
   ]);
 
   const projectCount: string = projects?.length.toString() || "0";
+  return (
+    <>
+      <div className="grid grid-cols-3 gap-4 border-y border-white/5 py-8 my-8">
+        <StatItem
+          icon={<Code2 className="w-4 h-4 mb-2 text-primary" />}
+          value={projectCount}
+          label="Shipped Projects"
+        />
+        <StatItem
+          icon={<Zap className="w-4 h-4 mb-2 text-blue-400" />}
+          value="< 24h"
+          label="Response Time"
+        />
+        <StatItem
+          icon={<Globe className="w-4 h-4 mb-2 text-green-400" />}
+          value="Remote"
+          label="Available"
+        />
+      </div>
 
+      <div className="flex flex-col md:flex-row items-center justify-start gap-4">
+        {profile?.resumeLink ? (
+          <Link
+            href={profile.resumeLink}
+            target="_blank"
+            rel="noreferrer"
+            className="group relative flex items-center justify-center overflow-hidden rounded-full bg-primary h-12 px-8 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
+          >
+            <Download className="mr-2 w-5 h-5" />
+            <span className="text-sm font-bold tracking-wide">Download CV</span>
+          </Link>
+        ) : null}
+        <Link
+          href="https://github.com/shahriar-ridom"
+          target="_blank"
+          className="group flex items-center justify-center rounded-full bg-white/5 border border-white/10 h-12 px-8 text-white hover:bg-white/10 transition-all"
+        >
+          <span className="text-sm font-medium">View GitHub</span>
+        </Link>
+      </div>
+    </>
+  );
+}
+
+// Main About Section component
+export async function AboutSection() {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("about-data");
+
+  const skills = await getSkills().catch(() => []);
   const minimalSkills = skills?.map((s) => ({
     name: s.name,
     id: s.id,
@@ -61,57 +117,23 @@ export async function AboutSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 border-y border-white/5 py-8 my-8">
-            <StatItem
-              icon={<Code2 className="w-4 h-4 mb-2 text-primary" />}
-              value={projectCount}
-              label="Shipped Projects"
-            />
-            <StatItem
-              icon={<Zap className="w-4 h-4 mb-2 text-blue-400" />}
-              value="< 24h"
-              label="Response Time"
-            />
-            <StatItem
-              icon={<Globe className="w-4 h-4 mb-2 text-green-400" />}
-              value="Remote"
-              label="Available"
-            />
-          </div>
-
-          <div className="flex flex-col md:flex-row items-center justify-start gap-4">
-            {profile?.resumeLink ? (
-              <Link
-                href={profile.resumeLink}
-                target="_blank"
-                rel="noreferrer"
-                className="group relative flex items-center justify-center overflow-hidden rounded-full bg-primary h-12 px-8 text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 active:scale-95"
-              >
-                <Download className="mr-2 w-5 h-5" />
-                <span className="text-sm font-bold tracking-wide">
-                  Download CV
-                </span>
-              </Link>
-            ) : null}
-            <Link
-              href="https://github.com/shahriar-ridom"
-              target="_blank"
-              className="group flex items-center justify-center rounded-full bg-white/5 border border-white/10 h-12 px-8 text-white hover:bg-white/10 transition-all"
-            >
-              <span className="text-sm font-medium">View GitHub</span>
-            </Link>
-          </div>
+          <Suspense fallback={<div className="my-8 h-20" />}>
+            <AboutStat />
+          </Suspense>
         </div>
 
         <div className="lg:col-span-7 flex flex-col justify-center relative">
           <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-100 h-100 bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-          <SkillsTabs skills={minimalSkills} />
+          <Suspense fallback={<div className="h-96 md:h-full" />}>
+            <SkillsTabs skills={minimalSkills} />
+          </Suspense>
         </div>
       </div>
 
       <div className="mt-20 opacity-60 hover:opacity-100 transition-opacity duration-500">
-        <TechMarquee skills={marqueeSkills} />
+        <Suspense fallback={<div className="h-24" />}>
+          <TechMarquee skills={marqueeSkills} />
+        </Suspense>
       </div>
     </section>
   );

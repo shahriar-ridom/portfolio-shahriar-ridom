@@ -5,7 +5,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects = await getProjects();
 
   const projectUrls = projects.map((project) => ({
-    url: `https://www.shahriardev.me/projects/${project.slug}`,
+    url: `https://www.shahriardev.me/project/${project.slug}`,
     lastModified: project.updatedAt,
   }));
 

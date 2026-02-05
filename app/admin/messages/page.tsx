@@ -1,12 +1,13 @@
 import prisma from "@/lib/prisma";
 import InboxInterface from "./inbox-interface";
+import { connection } from "next/server";
+import { Suspense } from "react";
 
-export const dynamic = "force-dynamic";
-
-export default async function InboxPage() {
+async function MessageList() {
+  await connection();
   const messages = await prisma.messages.findMany({
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
     select: {
       id: true,
@@ -19,9 +20,21 @@ export default async function InboxPage() {
     },
   });
 
+  return <InboxInterface initialMessages={messages} />;
+}
+
+export default function InboxPage() {
   return (
     <div className="h-[calc(100vh-64px)] overflow-hidden bg-black text-white">
-      <InboxInterface initialMessages={messages} />
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center h-full text-zinc-400">
+            Loading inbox...
+          </div>
+        }
+      >
+        <MessageList />
+      </Suspense>
     </div>
   );
 }

@@ -2,26 +2,9 @@ import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import dynamic from "next/dynamic";
-
-const AboutSection = dynamic(
-  () => import("@/components/about/stack").then((mod) => mod.AboutSection),
-  {
-    loading: () => <div className="h-96" />,
-    ssr: true,
-  },
-);
-
-const ProjectGrid = dynamic(
-  () => import("@/components/project-grid").then((mod) => mod.ProjectGrid),
-  {
-    loading: () => <ProjectLoader />,
-  },
-);
-
-const Contact = dynamic(() =>
-  import("@/components/contact/contact").then((mod) => mod.Contact),
-);
+import { AboutSection } from "@/components/about/stack";
+import { ProjectGrid } from "@/components/project-grid";
+import { Contact } from "@/components/contact/contact";
 
 const ProjectLoader = () => (
   <div className="flex items-center justify-center py-20 text-white/50">
