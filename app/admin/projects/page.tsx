@@ -62,7 +62,14 @@ export default async function ProjectsPage() {
                     <div className="flex items-center gap-3 mt-2 text-sm text-zinc-400">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {project.createdAt.toLocaleDateString()}
+                        {new Date(project.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "2-digit",
+                          },
+                        )}
                       </span>
                       <span className="w-1 h-1 bg-zinc-600 rounded-full" />
                       <p className="line-clamp-1 max-w-md">
