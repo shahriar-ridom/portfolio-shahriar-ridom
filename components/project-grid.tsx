@@ -1,5 +1,6 @@
 import { getProjects } from "@/app/actions";
 import { ProjectCard } from "@/components/project-card";
+import { cacheLife, cacheTag } from "next/cache";
 
 function getBentoClass(index: number) {
   if (index === 0) {
@@ -12,6 +13,10 @@ function getBentoClass(index: number) {
 }
 
 export async function ProjectGrid() {
+  "use cache";
+  cacheLife("weeks");
+  cacheTag("project-grid");
+
   const projects = await getProjects();
 
   if (!projects || projects.length === 0) {

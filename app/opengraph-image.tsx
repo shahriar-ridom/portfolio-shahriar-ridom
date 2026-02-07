@@ -62,6 +62,7 @@ export default async function Image() {
           src="https://mkelrgepyvmrqxxmmvix.supabase.co/storage/v1/object/public/image/shahriar-ridom-suit-cream.jpg"
           width="120"
           height="120"
+          alt="Shahriar Ridom"
           style={{
             borderRadius: "50%",
             border: "4px solid rgba(255,255,255,0.1)",

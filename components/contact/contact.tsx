@@ -1,7 +1,7 @@
 "use client";
 
 import { m } from "framer-motion";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import {
   Github,
   Linkedin,
@@ -15,7 +15,7 @@ import {
 import { ContactForm } from "./contact-form";
 import { cn } from "@/lib/utils";
 
-const EMAIL = "shahriarridom.info@gmail.com";
+const EMAIL = "info@shahriardev.me";
 
 const SOCIALS = [
   { name: "Github", href: "https://github.com/shahriar-ridom", icon: Github },
@@ -89,7 +89,7 @@ export function Contact() {
                 </p>
                 <button
                   onClick={handleCopyEmail}
-                  className="group flex items-center gap-4 text-xl md:text-3xl font-medium text-zinc-100 hover:text-primary transition-colors text-left"
+                  className="group cursor-pointer flex items-center gap-4 text-xl md:text-3xl font-medium text-zinc-100 hover:text-primary transition-colors text-left"
                   title="Click to copy email"
                 >
                   <Mail className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -134,13 +134,19 @@ export function Contact() {
           </m.div>
 
           <div className="w-full bg-zinc-900/20 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-white/5">
-            <ContactForm />
+            <Suspense
+              fallback={
+                <div className="text-center text-zinc-400">Loading form...</div>
+              }
+            >
+              <ContactForm />
+            </Suspense>
           </div>
         </div>
 
         <div className="w-full border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-muted-foreground/40 font-mono">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6 text-center md:text-left">
-            <span>© {new Date().getFullYear()} Shahriar Ridom</span>
+            <span>© 2026 Shahriar Ridom</span>
             <span className="hidden md:inline text-white/10">•</span>
             <span>Built with Next.js, Server Actions & Tailwind</span>
           </div>

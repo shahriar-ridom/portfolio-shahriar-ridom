@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowSVG: true,
   },
+  cacheComponents: true,
   async headers() {
     return [
       {

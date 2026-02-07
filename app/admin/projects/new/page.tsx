@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react"; // New hook in Next.js 15/16 (React 19)
-// If 'react' doesn't have it yet in your version, use: import { useFormState } from "react-dom";
+import { useActionState } from "react";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,10 +18,7 @@ const initialState = {
 };
 
 export default function NewProjectPage() {
-  // 1. Hook the server action
-  // state: contains the return value from createProject (success, message, errors)
-  // formAction: the function to pass to <form action={...}>
-  // isPending: true while submitting (replaces your manual 'saving' state)
+  // Hook the server action
   const [state, formAction, isPending] = useActionState(
     createProject,
     initialState
@@ -41,9 +37,8 @@ export default function NewProjectPage() {
 
       <Card className="bg-black/50 border-white/10">
         <CardContent className="pt-6">
-          {/* 2. Bind the formAction here */}
+          {/* Bind the formAction here */}
           <form action={formAction} className="space-y-6">
-            {/* Global Error Message (e.g., Database connection failed) */}
             {!state.success && state.message && (
               <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-sm">
                 {state.message}
@@ -58,7 +53,7 @@ export default function NewProjectPage() {
                 placeholder="e.g. E-Commerce Dashboard"
                 required // Client-side check
               />
-              {/* 3. Display Server-Side Validation Errors */}
+              {/* Display Server-Side Validation Errors */}
               {state.errors?.title && (
                 <p className="text-red-500 text-xs">{state.errors.title[0]}</p>
               )}
