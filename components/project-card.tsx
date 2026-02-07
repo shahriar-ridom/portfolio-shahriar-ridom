@@ -136,7 +136,7 @@ export function ProjectCard({
           <p className="text-white/60 line-clamp-2 text-sm mb-4">
             {project.description}
           </p>
-          <Link href={`/projects/${project.slug}`}>
+          <Link href={`/project/${project.slug}`}>
             <div className="flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 group-hover:cursor-pointer transition-opacity duration-300 -translate-x-4 group-hover:translate-x-0">
               View Project Details <ArrowRight className="w-4 h-4 ml-2" />
             </div>
