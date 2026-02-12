@@ -2,14 +2,31 @@ import { getProjects } from "@/app/actions";
 import { ProjectCard } from "@/components/project-card";
 import { cacheLife, cacheTag } from "next/cache";
 
+/**
+ * Repeating 6-item bento pattern:
+ * Row 1: [wide] [normal]
+ * Row 2: [normal] [wide]
+ * Row 3: [normal] [normal] [normal]
+ * Then repeats.
+ */
 function getBentoClass(index: number) {
-  if (index === 0) {
-    return "md:col-span-2 md:row-span-2";
+  const pos = index % 6;
+  switch (pos) {
+    case 0:
+      return "md:col-span-2 md:row-span-2"; // Hero — large
+    case 1:
+      return "md:col-span-1 md:row-span-2"; // Tall right
+    case 2:
+      return "md:col-span-1 md:row-span-1"; // Normal
+    case 3:
+      return "md:col-span-2 md:row-span-1"; // Wide
+    case 4:
+      return "md:col-span-1 md:row-span-1"; // Normal
+    case 5:
+      return "md:col-span-1 md:row-span-1"; // Normal
+    default:
+      return "md:col-span-1 md:row-span-1";
   }
-  if (index === 3 || index === 6) {
-    return "md:col-span-2 md:row-span-1";
-  }
-  return "md:col-span-1 md:row-span-1";
 }
 
 export async function ProjectGrid() {
@@ -48,11 +65,13 @@ export async function ProjectGrid() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 auto-rows-[280px] grid-flow-dense">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 auto-rows-[260px] grid-flow-dense">
         {projects.map((project, index) => {
           const spanClass = getBentoClass(index);
 
-          const isLarge = spanClass.includes("col-span-2");
+          const isLarge =
+            spanClass.includes("col-span-2") ||
+            spanClass.includes("row-span-2");
           const sizes = isLarge
             ? "(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 800px"
             : "(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px";

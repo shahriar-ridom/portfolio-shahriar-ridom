@@ -10,11 +10,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import prisma from "@/lib/prisma";
 import type { Metadata } from "next";
 import { getProjectBySlug } from "@/app/actions";
 
-// Define the shape of params for Next.js 16
+// Define the shape of params
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
@@ -108,22 +109,33 @@ export default async function ProjectPage({ params }: PageProps) {
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
               Project Overview
             </h2>
-            <div className="prose prose-invert max-w-none text-white/70 leading-relaxed">
-              <p>{project.description}</p>
-              {/* Render your Markdown/Rich Text content here */}
+            <div className="max-w-none text-white/70">
+              <MarkdownRenderer content={project.description} />
             </div>
           </section>
 
           {/* Media / Screenshot Gallery */}
-          <section>
-            <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
-            <div className="grid grid-cols-1 gap-6">
-              {/* Placeholder for gallery */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center text-white/30">
-                Additional Screenshots Go Here
+          {project.screenshots && project.screenshots.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-semibold mb-6">Gallery</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {project.screenshots.map((src, i) => (
+                  <div
+                    key={i}
+                    className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 bg-white/5 group cursor-pointer"
+                  >
+                    <Image
+                      src={src}
+                      alt={`${project.title} screenshot ${i + 1}`}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                    />
+                  </div>
+                ))}
               </div>
-            </div>
-          </section>
+            </section>
+          )}
         </div>
 
         {/* RIGHT COLUMN: Sidebar Info */}
