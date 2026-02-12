@@ -102,6 +102,7 @@ const projectSchema = z.object({
       : [],
   ),
   featured: z.boolean().optional(),
+  screenshots: z.array(z.string().url()).optional().default([]),
 });
 
 export const getProjects = unstable_cache(
@@ -142,6 +143,9 @@ export async function createProject(
     repoUrl: formData.get("repoUrl"),
     tags: formData.get("tags"),
     featured: formData.get("featured") === "on",
+    screenshots: formData
+      .getAll("screenshots")
+      .filter((s) => s !== "") as string[],
   };
 
   const validated = projectSchema.safeParse(rawData);
@@ -172,6 +176,7 @@ export async function createProject(
         liveUrl: validated.data.liveUrl || null,
         repoUrl: validated.data.repoUrl || null,
         tags: validated.data.tags,
+        screenshots: validated.data.screenshots,
         featured: validated.data.featured || false,
       },
     });
@@ -405,3 +410,164 @@ export const getProjectViaSlug = async (slug: string) => {
     console.error(error);
   }
 };
+
+// --- Review Actions ---
+
+const reviewSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  role: z.string().min(1, "Role is required"),
+  company: z.string().optional().or(z.literal("")),
+  content: z.string().min(10, "Review must be at least 10 characters"),
+  rating: z.coerce.number().min(1).max(5),
+  avatarUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+});
+
+export const getReviews = unstable_cache(
+  async () => {
+    try {
+      return await prisma.review.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+      return [];
+    }
+  },
+  ["user-reviews"],
+  { revalidate: 3600, tags: ["reviews"] },
+);
+
+export async function createReview(
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const rawData = {
+    name: formData.get("name"),
+    role: formData.get("role"),
+    company: formData.get("company"),
+    content: formData.get("content"),
+    rating: formData.get("rating"),
+    avatarUrl: formData.get("avatarUrl"),
+  };
+
+  const validated = reviewSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return {
+      success: false,
+      message: "Please fix the errors below",
+      errors: validated.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    await prisma.review.create({
+      data: {
+        name: validated.data.name,
+        role: validated.data.role,
+        company: validated.data.company || null,
+        content: validated.data.content,
+        rating: validated.data.rating,
+        avatarUrl: validated.data.avatarUrl || null,
+      },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin/reviews");
+    revalidateTag("reviews", "max");
+    return { success: true, message: "Review added successfully!" };
+  } catch (error) {
+    console.error("Create Review Error:", error);
+    return { success: false, message: "Failed to add review." };
+  }
+}
+
+export async function deleteReview(id: string): Promise<ActionState> {
+  try {
+    await prisma.review.delete({
+      where: { id },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin/reviews");
+    revalidateTag("reviews", "max");
+    return { success: true, message: "Review deleted" };
+  } catch (error) {
+    console.error("Delete Review Error:", error);
+    return { success: false, message: "Failed to delete review" };
+  }
+}
+
+// --- Update Project Action ---
+
+export async function updateProject(
+  projectId: string,
+  prevState: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  const rawData = {
+    title: formData.get("title"),
+    slug: formData.get("slug"),
+    description: formData.get("description"),
+    thumbnailUrl: formData.get("thumbnailUrl"),
+    liveUrl: formData.get("liveUrl"),
+    repoUrl: formData.get("repoUrl"),
+    tags: formData.get("tags"),
+    featured: formData.get("featured") === "on",
+    screenshots: formData
+      .getAll("screenshots")
+      .filter((s) => s !== "") as string[],
+  };
+
+  const validated = projectSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return {
+      success: false,
+      message: "Please fix the errors below",
+      errors: validated.error.flatten().fieldErrors,
+    };
+  }
+
+  let finalSlug = validated.data.slug;
+  if (!finalSlug || finalSlug.trim() === "") {
+    finalSlug = validated.data.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  try {
+    await prisma.project.update({
+      where: { id: projectId },
+      data: {
+        title: validated.data.title,
+        slug: finalSlug,
+        description: validated.data.description,
+        thumbnailUrl: validated.data.thumbnailUrl,
+        liveUrl: validated.data.liveUrl || null,
+        repoUrl: validated.data.repoUrl || null,
+        tags: validated.data.tags,
+        screenshots: validated.data.screenshots,
+        featured: validated.data.featured || false,
+      },
+    });
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return {
+          success: false,
+          message: "A project with this slug already exists.",
+          errors: { slug: ["Slug must be unique"] },
+        };
+      }
+    }
+    console.error("Update Project Error:", error);
+    return { success: false, message: "Failed to update project." };
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin/projects");
+  revalidateTag("projects", "max");
+  return { success: true, message: "Project updated successfully!" };
+}

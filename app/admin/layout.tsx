@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AdminSidebar } from "./admin-sidebar";
 
 export default function AdminLayout({
@@ -7,8 +8,13 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-
-      <AdminSidebar />
+      <Suspense
+        fallback={
+          <div className="w-64 bg-background/95 border-r border-white/10 hidden md:block" />
+        }
+      >
+        <AdminSidebar />
+      </Suspense>
 
       <main className="flex-1 relative flex flex-col h-screen overflow-hidden">
         <div className="flex-1 overflow-y-auto p-4 md:p-8 pt-16 md:pt-8">

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { Profile } from "@prisma/client";
 import { toast } from "sonner";
 
@@ -19,7 +20,7 @@ const initialState = {
 export function ProfileForm({ profile }: { profile: Profile | null }) {
   const [state, formAction, isPending] = useActionState(
     updateProfile,
-    initialState
+    initialState,
   );
 
   useEffect(() => {
@@ -72,12 +73,13 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Profile Image URL</Label>
-            <Input
-              id="imageUrl"
+            <Label>Profile Image</Label>
+            <ImageUpload
               name="imageUrl"
               defaultValue={profile?.imageUrl || ""}
-              placeholder="https://..."
+              folder="profile"
+              label="Upload profile image"
+              rounded
             />
             {state.errors?.imageUrl && (
               <p className="text-red-500 text-xs">{state.errors.imageUrl[0]}</p>

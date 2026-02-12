@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,7 +142,9 @@
   border-right: 0.15em solid var(--primary);
   white-space: nowrap;
   margin: 0;
-  animation: typing 3.5s steps(30, end), blink-caret 0.75s step-end infinite;
+  animation:
+    typing 3.5s steps(30, end),
+    blink-caret 0.75s step-end infinite;
 }
 
 @keyframes typing {

@@ -14,6 +14,7 @@ import {
   X,
   LucideIcon,
   Inbox,
+  MessageSquareQuote,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/profile", label: "Profile", icon: User },
   { href: "/admin/projects", label: "Projects", icon: FolderKanban },
   { href: "/admin/skills", label: "Skills", icon: Cpu },
+  { href: "/admin/reviews", label: "Reviews", icon: MessageSquareQuote },
   { href: "/admin/messages", label: "Inbox", icon: Inbox },
 ];
 
@@ -64,7 +66,7 @@ const NavContent = ({ pathname, onClose, onLogout }: NavContentProps) => (
               "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 font-medium",
               isActive
                 ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
+                : "hover:bg-white/5 text-muted-foreground hover:text-foreground",
             )}
           >
             <Icon className="w-5 h-5" />
@@ -124,7 +126,7 @@ export function AdminSidebar() {
       <aside
         className={cn(
           "fixed md:static inset-y-0 left-0 z-50 w-64 bg-background/95 backdrop-blur-xl border-r border-white/10 transition-transform duration-300 ease-in-out md:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <NavContent

@@ -1,34 +1,37 @@
 "use client";
 
 import { useActionState, useState } from "react";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Eye, Pencil } from "lucide-react";
-import { createProject } from "@/app/actions";
+import { updateProject, type ActionState } from "@/app/actions";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { MultiImageUpload } from "@/components/ui/multi-image-upload";
+import type { Project } from "@prisma/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Initial state for the reducer
-const initialState = {
+const initialState: ActionState = {
   success: false,
   message: "",
   errors: {},
 };
 
-export default function NewProjectPage() {
-  // Hook the server action
+interface EditProjectFormProps {
+  project: Project;
+}
+
+export function EditProjectForm({ project }: EditProjectFormProps) {
+  const updateProjectWithId = updateProject.bind(null, project.id);
   const [state, formAction, isPending] = useActionState(
-    createProject,
+    updateProjectWithId,
     initialState,
   );
 
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(project.description);
   const [previewMode, setPreviewMode] = useState(false);
 
   return (
@@ -39,15 +42,19 @@ export default function NewProjectPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h2 className="text-2xl font-bold">New Project</h2>
+        <h2 className="text-2xl font-bold">Edit Project</h2>
       </div>
 
       <Card className="bg-black/50 border-white/10">
         <CardContent className="pt-6">
-          {/* Bind the formAction here */}
           <form action={formAction} className="space-y-6">
             {!state.success && state.message && (
               <div className="p-3 bg-red-500/10 border border-red-500/20 rounded text-red-500 text-sm">
+                {state.message}
+              </div>
+            )}
+            {state.success && state.message && (
+              <div className="p-3 bg-green-500/10 border border-green-500/20 rounded text-green-500 text-sm">
                 {state.message}
               </div>
             )}
@@ -57,10 +64,10 @@ export default function NewProjectPage() {
               <Input
                 id="title"
                 name="title"
+                defaultValue={project.title}
                 placeholder="e.g. E-Commerce Dashboard"
-                required // Client-side check
+                required
               />
-              {/* Display Server-Side Validation Errors */}
               {state.errors?.title && (
                 <p className="text-red-500 text-xs">{state.errors.title[0]}</p>
               )}
@@ -71,6 +78,7 @@ export default function NewProjectPage() {
               <Input
                 id="slug"
                 name="slug"
+                defaultValue={project.slug}
                 placeholder="Leave empty to auto-generate"
               />
               {state.errors?.slug && (
@@ -114,10 +122,10 @@ export default function NewProjectPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono"
-                  placeholder="Write your project description in **Markdown**..."
                   required
                 />
               )}
+              {/* Hidden input to ensure form data is sent even in preview mode */}
               {previewMode && (
                 <input type="hidden" name="description" value={description} />
               )}
@@ -132,6 +140,7 @@ export default function NewProjectPage() {
               <Label>Thumbnail</Label>
               <ImageUpload
                 name="thumbnailUrl"
+                defaultValue={project.thumbnailUrl}
                 folder="projects"
                 label="Upload project thumbnail"
               />
@@ -146,6 +155,7 @@ export default function NewProjectPage() {
               <Label>Screenshots (optional)</Label>
               <MultiImageUpload
                 name="screenshots"
+                defaultValue={project.screenshots}
                 folder="projects/screenshots"
                 label="Upload project screenshots"
                 max={10}
@@ -155,7 +165,12 @@ export default function NewProjectPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="liveUrl">Live URL</Label>
-                <Input id="liveUrl" name="liveUrl" placeholder="https://..." />
+                <Input
+                  id="liveUrl"
+                  name="liveUrl"
+                  defaultValue={project.liveUrl || ""}
+                  placeholder="https://..."
+                />
                 {state.errors?.liveUrl && (
                   <p className="text-red-500 text-xs">
                     {state.errors.liveUrl[0]}
@@ -167,6 +182,7 @@ export default function NewProjectPage() {
                 <Input
                   id="repoUrl"
                   name="repoUrl"
+                  defaultValue={project.repoUrl || ""}
                   placeholder="https://github.com/..."
                 />
                 {state.errors?.repoUrl && (
@@ -182,6 +198,7 @@ export default function NewProjectPage() {
               <Input
                 id="tags"
                 name="tags"
+                defaultValue={project.tags.join(", ")}
                 placeholder="React, Next.js, TypeScript"
               />
               {state.errors?.tags && (
@@ -194,15 +211,15 @@ export default function NewProjectPage() {
                 type="checkbox"
                 id="featured"
                 name="featured"
+                defaultChecked={project.featured}
                 className="rounded border-white/20"
               />
               <Label htmlFor="featured">Featured project</Label>
             </div>
 
-            {/* Submit Button with Pending State */}
             <Button type="submit" disabled={isPending} className="w-full">
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isPending ? "Creating..." : "Create Project"}
+              {isPending ? "Saving..." : "Save Changes"}
             </Button>
           </form>
         </CardContent>
